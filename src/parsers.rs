@@ -10,7 +10,7 @@ use std::num::ParseIntError;
 
 #[allow(dead_code)] // TODO: remove
 fn question(i: &str) -> IResult<&str, Question> {
-    let (i, number) = question_number(i)?;
+    let (i, number) = question_header(i)?;
     let (i, _) = new_line(i)?;
     let (i, text) = text(i)?;
     let (i, _) = new_line(i)?;
@@ -27,7 +27,7 @@ fn question(i: &str) -> IResult<&str, Question> {
     ))
 }
 
-fn question_number(i: &str) -> IResult<&str, u32> {
+fn question_header(i: &str) -> IResult<&str, u32> {
     let (i, (_, num)) = tuple((tag("## Question "), map_res(digit1, to_int)))(i)?;
     Ok((i, num))
 }
@@ -47,7 +47,7 @@ fn text(i: &str) -> IResult<&str, String> {
 
 #[cfg(test)]
 mod test {
-    use super::{new_line, question_number, text};
+    use super::{new_line, question_header, text};
     use crate::parsers::question;
     use crate::Question;
 
@@ -75,7 +75,7 @@ Some text of the question
     #[test]
     fn test_question_number_parser() {
         let input = "## Question 1";
-        assert_eq!(question_number(input), Ok(("", 1)));
+        assert_eq!(question_header(input), Ok(("", 1)));
     }
 
     #[test]
