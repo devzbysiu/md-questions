@@ -18,6 +18,8 @@ fn question(i: &str) -> IResult<&str, Question> {
     let (i, _) = new_line(i)?;
     let (i, _) = answers_header(i)?;
     let (i, answers) = answers(i)?;
+    let (i, _) = new_line(i)?;
+    let (i, category) = category(i)?;
     Ok((
         i,
         Question {
@@ -25,7 +27,7 @@ fn question(i: &str) -> IResult<&str, Question> {
             text,
             answers,
             reading: None,
-            category: "".into(),
+            category,
         },
     ))
 }
@@ -48,13 +50,13 @@ fn text(i: &str) -> IResult<&str, String> {
     Ok((i, text.into()))
 }
 
-fn answers(i: &str) -> IResult<&str, Vec<Answer>> {
-    many_m_n(4, 4, answer)(i)
-}
-
 fn answers_header(i: &str) -> IResult<&str, &str> {
     let (i, (header, _)) = tuple((tag("## Answers"), char('\n')))(i)?;
     Ok((i, header))
+}
+
+fn answers(i: &str) -> IResult<&str, Vec<Answer>> {
+    many_m_n(4, 4, answer)(i)
 }
 
 fn answer(i: &str) -> IResult<&str, Answer> {
@@ -77,9 +79,14 @@ fn answer(i: &str) -> IResult<&str, Answer> {
     ))
 }
 
+fn category(i: &str) -> IResult<&str, String> {
+    let (i, (_, category)) = tuple((tag("> "), text))(i)?;
+    Ok((i, category))
+}
+
 #[cfg(test)]
 mod test {
-    use super::{answer, answers, answers_header, new_line, question_header, text};
+    use super::{answer, answers, answers_header, category, new_line, question_header, text};
     use crate::parser::question;
     use crate::{Answer, Question};
 
@@ -93,11 +100,13 @@ Some text of the question
 - [ ] Create a new custom component from scratch.
 - [ ] Overlay the teaser core component.
 - [x] Inherit from the teaser core component.
+
+> Templates and Components
 "#;
         assert_eq!(
             question(input),
             Ok((
-                "",
+                "\n",
                 Question {
                     number: 1,
                     text: "Some text of the question".into(),
@@ -120,7 +129,7 @@ Some text of the question
                         },
                     ],
                     reading: None,
-                    category: "".into()
+                    category: "Templates and Components".into()
                 }
             ))
         );
@@ -212,6 +221,16 @@ Some text of the question
                     }
                 ]
             ))
+        )
+    }
+
+    #[test]
+    fn test_category_parser() {
+        let input = r#"> Templates and Components
+"#;
+        assert_eq!(
+            category(input),
+            Ok(("\n", "Templates and Components".into()))
         )
     }
 }
