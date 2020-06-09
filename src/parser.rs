@@ -16,12 +16,14 @@ fn question(i: &str) -> IResult<&str, Question> {
     let (i, text) = text(i)?;
     let (i, _) = new_line(i)?;
     let (i, _) = new_line(i)?;
+    let (i, _) = answers_header(i)?;
+    let (i, answers) = answers(i)?;
     Ok((
         i,
         Question {
             number,
             text,
-            answers: vec![],
+            answers,
             reading: None,
             category: "".into(),
         },
@@ -78,7 +80,7 @@ fn answer(i: &str) -> IResult<&str, Answer> {
 #[cfg(test)]
 mod test {
     use super::{answer, answers, answers_header, new_line, question_header, text};
-    use crate::parsers::question;
+    use crate::parser::question;
     use crate::{Answer, Question};
 
     #[test]
@@ -86,6 +88,11 @@ mod test {
         let input = r#"## Question 1
 Some text of the question
 
+## Answers
+- [ ] Use and configure the teaser core component.
+- [ ] Create a new custom component from scratch.
+- [ ] Overlay the teaser core component.
+- [x] Inherit from the teaser core component.
 "#;
         assert_eq!(
             question(input),
@@ -94,7 +101,24 @@ Some text of the question
                 Question {
                     number: 1,
                     text: "Some text of the question".into(),
-                    answers: vec![],
+                    answers: vec![
+                        Answer {
+                            text: "Use and configure the teaser core component.".into(),
+                            is_correct: false,
+                        },
+                        Answer {
+                            text: "Create a new custom component from scratch.".into(),
+                            is_correct: false,
+                        },
+                        Answer {
+                            text: "Overlay the teaser core component.".into(),
+                            is_correct: false,
+                        },
+                        Answer {
+                            text: "Inherit from the teaser core component.".into(),
+                            is_correct: true,
+                        },
+                    ],
                     reading: None,
                     category: "".into()
                 }

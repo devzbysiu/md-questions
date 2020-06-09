@@ -1,4 +1,4 @@
-mod parsers;
+mod parser;
 
 #[derive(Debug, Eq, PartialEq)]
 struct Question {
