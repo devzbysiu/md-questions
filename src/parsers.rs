@@ -1,4 +1,6 @@
+use crate::Answer;
 use crate::Question;
+use nom::branch::alt;
 use nom::bytes::complete::tag;
 use nom::bytes::complete::take_until;
 use nom::character::complete::char;
@@ -45,11 +47,26 @@ fn text(i: &str) -> IResult<&str, String> {
     Ok((i, text.into()))
 }
 
+fn answer(i: &str) -> IResult<&str, Answer> {
+    let (i, (checkbox, _, text)) = tuple((alt((tag("[ ]"), tag("[x]"))), char(' '), text))(i)?;
+    let mut is_correct = false;
+    if checkbox == "[x]" {
+        is_correct = true;
+    }
+    Ok((
+        i,
+        Answer {
+            text: text.into(),
+            is_correct,
+        },
+    ))
+}
+
 #[cfg(test)]
 mod test {
-    use super::{new_line, question_header, text};
+    use super::{answer, new_line, question_header, text};
     use crate::parsers::question;
-    use crate::Question;
+    use crate::{Answer, Question};
 
     #[test]
     fn test_question_parser() {
@@ -90,5 +107,34 @@ Some text of the question
         let input = r#"Some text here
 "#;
         assert_eq!(text(input), Ok(("\n", "Some text here".into())));
+    }
+
+    #[test]
+    fn test_answer_parser() {
+        let input = r#"[ ] Some answer
+"#;
+        assert_eq!(
+            answer(input),
+            Ok((
+                "\n",
+                Answer {
+                    text: "Some answer".into(),
+                    is_correct: false,
+                }
+            ))
+        );
+
+        let input = r#"[x] Some answer
+"#;
+        assert_eq!(
+            answer(input),
+            Ok((
+                "\n",
+                Answer {
+                    text: "Some answer".into(),
+                    is_correct: true,
+                }
+            ))
+        );
     }
 }
