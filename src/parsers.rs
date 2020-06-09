@@ -50,6 +50,11 @@ fn answers(i: &str) -> IResult<&str, Vec<Answer>> {
     many_m_n(4, 4, answer)(i)
 }
 
+fn answers_header(i: &str) -> IResult<&str, &str> {
+    let (i, (header, _)) = tuple((tag("## Answers"), char('\n')))(i)?;
+    Ok((i, header))
+}
+
 fn answer(i: &str) -> IResult<&str, Answer> {
     let (i, (checkbox, _, text, _)) = tuple((
         alt((tag("- [ ]"), tag("- [x]"))),
@@ -72,7 +77,7 @@ fn answer(i: &str) -> IResult<&str, Answer> {
 
 #[cfg(test)]
 mod test {
-    use super::{answer, answers, new_line, question_header, text};
+    use super::{answer, answers, answers_header, new_line, question_header, text};
     use crate::parsers::question;
     use crate::{Answer, Question};
 
@@ -98,7 +103,7 @@ Some text of the question
     }
 
     #[test]
-    fn test_question_number_parser() {
+    fn test_question_header_parser() {
         let input = "## Question 1";
         assert_eq!(question_header(input), Ok(("", 1)));
     }
@@ -144,6 +149,13 @@ Some text of the question
                 }
             ))
         );
+    }
+
+    #[test]
+    fn test_answers_header_parser() {
+        let input = r#"## Answers
+"#;
+        assert_eq!(answers_header(input), Ok(("", "## Answers")))
     }
 
     #[test]
