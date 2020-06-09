@@ -1,11 +1,10 @@
 use crate::Answer;
 use crate::Question;
 use nom::branch::alt;
-use nom::bytes::complete::tag;
-use nom::bytes::complete::take_until;
-use nom::character::complete::char;
-use nom::character::complete::digit1;
+use nom::bytes::complete::{tag, take_until};
+use nom::character::complete::{char, digit1};
 use nom::combinator::map_res;
+use nom::multi::many_m_n;
 use nom::sequence::tuple;
 use nom::IResult;
 use std::num::ParseIntError;
@@ -47,10 +46,19 @@ fn text(i: &str) -> IResult<&str, String> {
     Ok((i, text.into()))
 }
 
+fn answers(i: &str) -> IResult<&str, Vec<Answer>> {
+    many_m_n(4, 4, answer)(i)
+}
+
 fn answer(i: &str) -> IResult<&str, Answer> {
-    let (i, (checkbox, _, text)) = tuple((alt((tag("[ ]"), tag("[x]"))), char(' '), text))(i)?;
+    let (i, (checkbox, _, text, _)) = tuple((
+        alt((tag("- [ ]"), tag("- [x]"))),
+        char(' '),
+        text,
+        char('\n'),
+    ))(i)?;
     let mut is_correct = false;
-    if checkbox == "[x]" {
+    if checkbox == "- [x]" {
         is_correct = true;
     }
     Ok((
@@ -64,7 +72,7 @@ fn answer(i: &str) -> IResult<&str, Answer> {
 
 #[cfg(test)]
 mod test {
-    use super::{answer, new_line, question_header, text};
+    use super::{answer, answers, new_line, question_header, text};
     use crate::parsers::question;
     use crate::{Answer, Question};
 
@@ -111,12 +119,12 @@ Some text of the question
 
     #[test]
     fn test_answer_parser() {
-        let input = r#"[ ] Some answer
+        let input = r#"- [ ] Some answer
 "#;
         assert_eq!(
             answer(input),
             Ok((
-                "\n",
+                "",
                 Answer {
                     text: "Some answer".into(),
                     is_correct: false,
@@ -124,17 +132,50 @@ Some text of the question
             ))
         );
 
-        let input = r#"[x] Some answer
+        let input = r#"- [x] Some answer
 "#;
         assert_eq!(
             answer(input),
             Ok((
-                "\n",
+                "",
                 Answer {
                     text: "Some answer".into(),
                     is_correct: true,
                 }
             ))
         );
+    }
+
+    #[test]
+    fn test_answers_parser() {
+        let input = r#"- [ ] Use and configure the teaser core component.
+- [ ] Create a new custom component from scratch.
+- [ ] Overlay the teaser core component.
+- [x] Inherit from the teaser core component.
+"#;
+        assert_eq!(
+            answers(input),
+            Ok((
+                "",
+                vec![
+                    Answer {
+                        text: "Use and configure the teaser core component.".into(),
+                        is_correct: false,
+                    },
+                    Answer {
+                        text: "Create a new custom component from scratch.".into(),
+                        is_correct: false,
+                    },
+                    Answer {
+                        text: "Overlay the teaser core component.".into(),
+                        is_correct: false,
+                    },
+                    Answer {
+                        text: "Inherit from the teaser core component.".into(),
+                        is_correct: true,
+                    }
+                ]
+            ))
+        )
     }
 }
