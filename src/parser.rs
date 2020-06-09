@@ -60,12 +60,7 @@ fn answers(i: &str) -> IResult<&str, Vec<Answer>> {
 }
 
 fn answer(i: &str) -> IResult<&str, Answer> {
-    let (i, (checkbox, _, text, _)) = tuple((
-        alt((tag("- [ ]"), tag("- [x]"))),
-        char(' '),
-        text,
-        char('\n'),
-    ))(i)?;
+    let (i, (checkbox, _, text, _)) = tuple((answer_checkbox, char(' '), text, char('\n')))(i)?;
     let mut is_correct = false;
     if checkbox == "- [x]" {
         is_correct = true;
@@ -79,6 +74,10 @@ fn answer(i: &str) -> IResult<&str, Answer> {
     ))
 }
 
+fn answer_checkbox(i: &str) -> IResult<&str, &str> {
+    alt((tag("- [ ]"), tag("- [x]")))(i)
+}
+
 fn category(i: &str) -> IResult<&str, String> {
     let (i, (_, category)) = tuple((tag("> "), text))(i)?;
     Ok((i, category))
@@ -86,7 +85,9 @@ fn category(i: &str) -> IResult<&str, String> {
 
 #[cfg(test)]
 mod test {
-    use super::{answer, answers, answers_header, category, new_line, question_header, text};
+    use super::{
+        answer, answer_checkbox, answers, answers_header, category, new_line, question_header, text,
+    };
     use crate::parser::question;
     use crate::{Answer, Question};
 
@@ -189,6 +190,14 @@ Some text of the question
         let input = r#"## Answers
 "#;
         assert_eq!(answers_header(input), Ok(("", "## Answers")))
+    }
+
+    #[test]
+    fn test_answer_checkbox() {
+        let input = "- [ ]";
+        assert_eq!(answer_checkbox(input), Ok(("", "- [ ]")));
+        let input = "- [x]";
+        assert_eq!(answer_checkbox(input), Ok(("", "- [x]")));
     }
 
     #[test]
