@@ -12,7 +12,7 @@ A developer needs to create a banner component. This component shows an image ac
 ## Question 2 `OSGi Services`
 A developer is working on a complex project with multiple bundles. One bundle provides an OSGi service for other bundles. Which two options are necessary to ensure that the other bundles can reference that OSGi service? (Choose two.)
 
-## Answers:
+## Answers
 - [x] The bundles consuming the service need to import the fully qualified name of the service interface.
 - [ ] The service needs to correctly declare metatype information.
 - [ ] The bundle providing the service needs to contain a whitelist of allowed consumer bundles.
@@ -24,13 +24,13 @@ A developer is working on a complex project with multiple bundles. One bundle pr
 ## Question 3 `Templates and Components`
 The structure section of an editable template has a locked component. What happens to the content of that component when a developer unlocks it?
 
-## Answers:
+## Answers
 - [ ] The content stays in the same place but it ignored on pages using the template.
 - [x] The content is moved to the initial section of the editable template.
 - [ ] The content is deleted after confirmation from the template author.
 - [ ] The content is copied to the initial section of the editable template.
 
-## Reading:
+## Reading
 - [here](reading/question-3-reading.md)
 
 ---
