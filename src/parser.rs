@@ -9,7 +9,7 @@ use nom::IResult;
 use std::num::ParseIntError;
 
 #[allow(dead_code)] // TODO: remove
-fn questions(i: &str) -> IResult<&str, Questions> {
+pub(crate) fn questions(i: &str) -> IResult<&str, Questions> {
     let (i, questions) = many1(question)(i)?;
     Ok((i, Questions::new(questions)))
 }
@@ -90,7 +90,7 @@ fn answers(i: &str) -> IResult<&str, Vec<Answer>> {
 fn answer(i: &str) -> IResult<&str, Answer> {
     let (i, (checkbox, _, text, _)) = tuple((answer_checkbox, char(' '), line, char('\n')))(i)?;
     let is_correct = checkbox == "- [x]";
-    Ok((i, Answer { text, is_correct }))
+    Ok((i, Answer::new(text, is_correct)))
 }
 
 fn answer_checkbox(i: &str) -> IResult<&str, &str> {
@@ -166,86 +166,34 @@ The structure section of an editable template has a locked component. What happe
             questions(input),
             Ok((
                 "",
-                Questions {
-                    questions: vec![
-                        Question {
-                            number: 1,
-                            text: "A developer needs to create a banner component. This component shows an image across the full width of the page. A title is shown on top of the image. This text can be aligned to the left, middle, or right. The core components feature a teaser component which matches almost all requirements, but not all. What is the most maintainable way for the developer to implement these requirements?".into(),
-                            answers: vec![
-                                Answer {
-                                    text: "Use and configure the teaser core component.".into(),
-                                    is_correct: false,
-                                },
-                                Answer {
-                                    text: "Create a new custom component from scratch.".into(),
-                                    is_correct: false,
-                                },
-                                Answer {
-                                    text: "Overlay the teaser core component.".into(),
-                                    is_correct: false,
-                                },
-                                Answer {
-                                    text: "Inherit from the teaser core component.".into(),
-                                    is_correct: true,
-                                },
-                            ],
-                            reading: None,
-                            category: "Templates and Components".into()
-                        },
-                        Question {
-                            number: 2,
-                            text: "A developer is working on a complex project with multiple bundles. One bundle provides an OSGi service for other bundles. Which two options are necessary to ensure that the other bundles can reference that OSGi service? (Choose two.)".into(),
-                            answers: vec![
-                                Answer {
-                                    text: "The bundles consuming the service need to import the fully qualified name of the service interface.".into(),
-                                    is_correct: true,
-                                },
-                                Answer {
-                                    text: "The service needs to correctly declare metatype information.".into(),
-                                    is_correct: false,
-                                },
-                                Answer {
-                                    text: "The bundle providing the service needs to contain a whitelist of allowed consumer bundles.".into(),
-                                    is_correct: false,
-                                },
-                                Answer {
-                                    text: "The bundle providing the service needs to contain an adequate SCR descriptor file.".into(),
-                                    is_correct: false,
-                                },
-                                Answer {
-                                    text: "The bundle providing the service needs to export the java package of the service interface.".into(),
-                                    is_correct: true,
-                                }
-                            ],
-                            reading: None,
-                            category: "OSGi Services".into()
-                        },
-                        Question {
-                            number: 3,
-                            text: "The structure section of an editable template has a locked component. What happens to the content of that component when a developer unlocks it?".into(),
-                            answers: vec![
-                                Answer {
-                                    text: "The content stays in the same place but it ignored on pages using the template.".into(),
-                                    is_correct: false,
-                                },
-                                Answer {
-                                    text: "The content is moved to the initial section of the editable template.".into(),
-                                    is_correct: true,
-                                },
-                                Answer {
-                                    text: "The content is deleted after confirmation from the template author.".into(),
-                                    is_correct: false,
-                                },
-                                Answer {
-                                    text: "The content is copied to the initial section of the editable template.".into(),
-                                    is_correct: false,
-                                },
-                            ],
-                            reading: Some("reading/question-3-reading.md".into()),
-                            category: "Templates and Components".into()
-                        },
-                    ]
-                }
+                Questions::new(vec![
+                    Question::default()
+                        .with_number(1)
+                        .with_text("A developer needs to create a banner component. This component shows an image across the full width of the page. A title is shown on top of the image. This text can be aligned to the left, middle, or right. The core components feature a teaser component which matches almost all requirements, but not all. What is the most maintainable way for the developer to implement these requirements?")
+                        .with_answer(Answer::new("Use and configure the teaser core component.", false))
+                        .with_answer(Answer::new("Create a new custom component from scratch.", false))
+                        .with_answer(Answer::new("Overlay the teaser core component.", false))
+                        .with_answer(Answer::new("Inherit from the teaser core component.", true))
+                        .with_category("Templates and Components"),
+                    Question::default()
+                        .with_number(2)
+                        .with_text("A developer is working on a complex project with multiple bundles. One bundle provides an OSGi service for other bundles. Which two options are necessary to ensure that the other bundles can reference that OSGi service? (Choose two.)")
+                        .with_answer(Answer::new( "The bundles consuming the service need to import the fully qualified name of the service interface.", true))
+                        .with_answer(Answer::new("The service needs to correctly declare metatype information.", false))
+                        .with_answer(Answer::new("The bundle providing the service needs to contain a whitelist of allowed consumer bundles.", false))
+                        .with_answer(Answer::new("The bundle providing the service needs to contain an adequate SCR descriptor file.", false))
+                        .with_answer(Answer::new("The bundle providing the service needs to export the java package of the service interface.", true))
+                        .with_category("OSGi Services"),
+                    Question::default()
+                        .with_number(3)
+                        .with_text("The structure section of an editable template has a locked component. What happens to the content of that component when a developer unlocks it?")
+                        .with_answer(Answer::new("The content stays in the same place but it ignored on pages using the template.", false))
+                        .with_answer(Answer::new("The content is moved to the initial section of the editable template.", true))
+                        .with_answer(Answer::new("The content is deleted after confirmation from the template author.", false))
+                        .with_answer(Answer::new("The content is copied to the initial section of the editable template.", false))
+                        .with_reading("reading/question-3-reading.md")
+                        .with_category("Templates and Components")
+                ])
             ))
         );
     }
@@ -271,99 +219,61 @@ A developer needs to create a banner component. This component shows an image ac
             question(input),
             Ok((
                 "",
-                Question {
-                    number: 1,
-                    text: "A developer needs to create a banner component. This component shows an image across the full width of the page. A title is shown on top of the image. This text can be aligned to the left, middle, or right. The core components feature a teaser component which matches almost all requirements, but not all. What is the most maintainable way for the developer to implement these requirements?".into(),
-                    answers: vec![
-                        Answer {
-                            text: "Use and configure the teaser core component.".into(),
-                            is_correct: false,
-                        },
-                        Answer {
-                            text: "Create a new custom component from scratch.".into(),
-                            is_correct: false,
-                        },
-                        Answer {
-                            text: "Overlay the teaser core component.".into(),
-                            is_correct: false,
-                        },
-                        Answer {
-                            text: "Inherit from the teaser core component.".into(),
-                            is_correct: true,
-                        },
-                    ],
-                    reading: Some("reading/question-3-reading.md".into()),
-                    category: "Templates and Components".into()
-                }
+                Question::default()
+                    .with_number(1)
+                    .with_text("A developer needs to create a banner component. This component shows an image across the full width of the page. A title is shown on top of the image. This text can be aligned to the left, middle, or right. The core components feature a teaser component which matches almost all requirements, but not all. What is the most maintainable way for the developer to implement these requirements?")
+                    .with_answer(Answer::new("Use and configure the teaser core component.", false))
+                    .with_answer(Answer::new("Create a new custom component from scratch.", false))
+                    .with_answer(Answer::new("Overlay the teaser core component.", false))
+                    .with_answer(Answer::new("Inherit from the teaser core component.", true))
+                    .with_category("Templates and Components")
+                    .with_reading("reading/question-3-reading.md")
             ))
         );
     }
 
     #[test]
     fn test_question_header_parser() {
-        let input = "## Question 1 `Templates and Components`";
         assert_eq!(
-            question_header(input),
+            question_header("## Question 1 `Templates and Components`"),
             Ok(("", (1, "Templates and Components".into())))
         );
     }
 
     #[test]
     fn test_new_line_parser() {
-        let input = r#"
-"#;
-        assert_eq!(new_line(input), Ok(("", '\n')));
+        assert_eq!(new_line("\n"), Ok(("", '\n')));
     }
 
     #[test]
     fn test_line_parser() {
-        let input = r#"Some text here
-"#;
-        assert_eq!(line(input), Ok(("\n", "Some text here".into())));
+        assert_eq!(
+            line("Some text here\n"),
+            Ok(("\n", "Some text here".into()))
+        );
     }
 
     #[test]
     fn test_answer_parser() {
-        let incorrect_answer = r#"- [ ] Some answer
-"#;
         assert_eq!(
-            answer(incorrect_answer),
-            Ok((
-                "",
-                Answer {
-                    text: "Some answer".into(),
-                    is_correct: false,
-                }
-            ))
+            answer("- [ ] Some answer\n"),
+            Ok(("", Answer::new("Some answer", false)))
         );
-
-        let correct_answer = r#"- [x] Some answer
-"#;
         assert_eq!(
-            answer(correct_answer),
-            Ok((
-                "",
-                Answer {
-                    text: "Some answer".into(),
-                    is_correct: true,
-                }
-            ))
+            answer("- [x] Some answer\n"),
+            Ok(("", Answer::new("Some answer", true)))
         );
     }
 
     #[test]
     fn test_answers_header_parser() {
-        let input = r#"## Answers
-"#;
-        assert_eq!(answers_header(input), Ok(("\n", "## Answers")))
+        assert_eq!(answers_header("## Answers\n"), Ok(("\n", "## Answers")))
     }
 
     #[test]
     fn test_answer_checkbox() {
-        let unchecked = "- [ ]";
-        assert_eq!(answer_checkbox(unchecked), Ok(("", "- [ ]")));
-        let checked = "- [x]";
-        assert_eq!(answer_checkbox(checked), Ok(("", "- [x]")));
+        assert_eq!(answer_checkbox("- [ ]"), Ok(("", "- [ ]")));
+        assert_eq!(answer_checkbox("- [x]"), Ok(("", "- [x]")));
     }
 
     #[test]
@@ -378,22 +288,10 @@ A developer needs to create a banner component. This component shows an image ac
             Ok((
                 "",
                 vec![
-                    Answer {
-                        text: "Use and configure the teaser core component.".into(),
-                        is_correct: false,
-                    },
-                    Answer {
-                        text: "Create a new custom component from scratch.".into(),
-                        is_correct: false,
-                    },
-                    Answer {
-                        text: "Overlay the teaser core component.".into(),
-                        is_correct: false,
-                    },
-                    Answer {
-                        text: "Inherit from the teaser core component.".into(),
-                        is_correct: true,
-                    }
+                    Answer::new("Use and configure the teaser core component.", false),
+                    Answer::new("Create a new custom component from scratch.", false),
+                    Answer::new("Overlay the teaser core component.", false),
+                    Answer::new("Inherit from the teaser core component.", true)
                 ]
             ))
         );
@@ -401,34 +299,25 @@ A developer needs to create a banner component. This component shows an image ac
 
     #[test]
     fn test_reading_header_parser() {
-        let reading_header_present = r#"## Reading
-"#;
         assert_eq!(
-            opt_reading_header(reading_header_present),
+            opt_reading_header("## Reading\n"),
             Ok(("\n", Some("## Reading")))
         );
-
-        let lack_of_header = r#""#;
-        assert_eq!(opt_reading_header(lack_of_header), Ok(("", None)))
+        assert_eq!(opt_reading_header(""), Ok(("", None)))
     }
 
     #[test]
     fn test_reading_parser() {
-        let reading_present = r#"- [here](reading/question-3-reading.md)
-"#;
         assert_eq!(
-            opt_reading(reading_present),
+            opt_reading("- [here](reading/question-3-reading.md)\n"),
             Ok(("\n", Some("reading/question-3-reading.md".into())))
         );
 
-        let lack_of_reading = r#""#;
-        assert_eq!(opt_reading(lack_of_reading), Ok(("", None)))
+        assert_eq!(opt_reading(""), Ok(("", None)))
     }
 
     #[test]
     fn test_horizontal_rule_parser() {
-        let input = r#"---
-"#;
-        assert_eq!(horizontal_rule(input), Ok(("\n", "---")));
+        assert_eq!(horizontal_rule("---\n"), Ok(("\n", "---")));
     }
 }
