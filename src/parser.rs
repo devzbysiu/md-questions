@@ -65,13 +65,7 @@ fn answer(i: &str) -> IResult<&str, Answer> {
     if checkbox == "- [x]" {
         is_correct = true;
     }
-    Ok((
-        i,
-        Answer {
-            text: text.into(),
-            is_correct,
-        },
-    ))
+    Ok((i, Answer { text, is_correct }))
 }
 
 fn answer_checkbox(i: &str) -> IResult<&str, &str> {
