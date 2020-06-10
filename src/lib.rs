@@ -14,6 +14,8 @@ mod parser;
 /// # fn main() -> Result<(), Box<dyn Error>> {
 /// let content = read_to_string("res/QUESTIONS.md")?;
 /// let questions = Questions::from(content.as_str());
+/// let first_question = &questions[0];
+/// println!("First question: {}", first_question.text());
 /// # Ok(())
 /// # }
 /// ```
@@ -52,6 +54,25 @@ impl Index<usize> for Questions {
 }
 
 /// Single question.
+///
+/// Example of usage:
+/// ```
+/// # use std::error::Error;
+/// use md_questions::{Question, Answer};
+///
+/// # fn main() -> Result<(), Box<dyn Error>> {
+/// let question = Question::default()
+///     .with_number(1)
+///     .with_text("Why the sky is blue?")
+///     .with_answer(Answer::new("Because of oxygen", false))
+///     .with_answer(Answer::new("Because of oceans", false))
+///     .with_answer(Answer::new("Because of atmosphere", true))
+///     .with_answer(Answer::new("It's not", false))
+///     .with_category("General")
+///     .with_reading("https://spaceplace.nasa.gov/blue-sky/en/");
+/// # Ok(())
+/// # }
+/// ```
 #[derive(Debug, Eq, PartialEq)]
 pub struct Question {
     /// Number of the question in order.
@@ -96,6 +117,31 @@ impl Question {
         self.category = category.into();
         self
     }
+
+    #[must_use]
+    pub fn number(&self) -> u32 {
+        self.number
+    }
+
+    #[must_use]
+    pub fn text(&self) -> String {
+        self.text.clone()
+    }
+
+    #[must_use]
+    pub fn answer(&self) -> &[Answer] {
+        &self.answers
+    }
+
+    #[must_use]
+    pub fn reading(&self) -> Option<&String> {
+        self.reading.as_ref()
+    }
+
+    #[must_use]
+    pub fn categor(&self) -> String {
+        self.category.clone()
+    }
 }
 
 impl Default for Question {
@@ -111,11 +157,22 @@ impl Default for Question {
 }
 
 /// One of the answers available in a question.
+///
+/// Example usage:
+/// ```
+/// # use std::error::Error;
+/// use md_questions::Answer;
+///
+/// # fn main() -> Result<(), Box<dyn Error>> {
+/// let answer = Answer::new("Rust is great", true);
+/// # Ok(())
+/// # }
+/// ```
 #[derive(Debug, Eq, PartialEq)]
 pub struct Answer {
     /// Answer text.
     text: String,
-    /// Is question correct?
+    /// Is answer correct?
     is_correct: bool,
 }
 
