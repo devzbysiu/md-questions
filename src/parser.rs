@@ -8,7 +8,6 @@ use nom::sequence::tuple;
 use nom::IResult;
 use std::num::ParseIntError;
 
-#[allow(dead_code)] // TODO: remove
 pub(crate) fn questions(i: &str) -> IResult<&str, Questions> {
     let (i, questions) = many1(question)(i)?;
     Ok((i, Questions::new(questions)))

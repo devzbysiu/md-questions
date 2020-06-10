@@ -3,6 +3,20 @@ use std::ops::Index;
 
 mod parser;
 
+/// Contains all questions parsed from markdown.
+///
+/// Example usage:
+/// ```
+/// # use std::error::Error;
+/// # use std::fs::read_to_string;
+/// use md_questions::Questions;
+///
+/// # fn main() -> Result<(), Box<dyn Error>> {
+/// let content = read_to_string("res/QUESTIONS.md")?;
+/// let questions = Questions::from(content.as_str());
+/// # Ok(())
+/// # }
+/// ```
 #[derive(Debug, Eq, PartialEq)]
 pub struct Questions {
     questions: Vec<Question>,
@@ -37,12 +51,18 @@ impl Index<usize> for Questions {
     }
 }
 
+/// Single question.
 #[derive(Debug, Eq, PartialEq)]
 pub struct Question {
+    /// Number of the question in order.
     number: u32,
+    /// Questions content.
     text: String,
+    /// Possible answers. Multiple answers can be correct.
     answers: Vec<Answer>,
+    /// Additional materials. Optional.
     reading: Option<String>,
+    /// Category of the question.
     category: String,
 }
 
@@ -90,9 +110,12 @@ impl Default for Question {
     }
 }
 
+/// One of the answers available in a question.
 #[derive(Debug, Eq, PartialEq)]
 pub struct Answer {
+    /// Answer text.
     text: String,
+    /// Is question correct?
     is_correct: bool,
 }
 
