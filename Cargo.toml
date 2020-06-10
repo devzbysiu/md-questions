@@ -17,6 +17,14 @@
 name = "md_questions"
 version = "0.1.0"
 authors = ["Bartosz Zbytniewski <bartosz.zbytniewski.dev@gmail.com>"]
+description = "Parses questions from markdown file"
+keywords = ["markdown", "parser", "quiz"]
+license = "MIT/Apache-2.0"
+readme = "README.md"
+categories = ["parsing"]
+repository = "https://github.com/devzbysiu/md-questions"
+homepage = "https://github.com/devzbysiu/cargo-blinc"
+documentation = "https://docs.rs/md-questions"
 edition = "2018"
 
 [dependencies]
