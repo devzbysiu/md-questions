@@ -47,26 +47,31 @@ pub struct Question {
 }
 
 impl Question {
+    #[must_use]
     pub fn with_number(mut self, number: u32) -> Self {
         self.number = number;
         self
     }
 
+    #[must_use]
     pub fn with_text<S: Into<String>>(mut self, text: S) -> Self {
         self.text = text.into();
         self
     }
 
+    #[must_use]
     pub fn with_answer(mut self, answer: Answer) -> Self {
         self.answers.push(answer);
         self
     }
 
+    #[must_use]
     pub fn with_reading<S: Into<String>>(mut self, reading: S) -> Self {
         self.reading = Some(reading.into());
         self
     }
 
+    #[must_use]
     pub fn with_category<S: Into<String>>(mut self, category: S) -> Self {
         self.category = category.into();
         self
