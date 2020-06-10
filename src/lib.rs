@@ -9,10 +9,31 @@ pub struct Question {
     category: String,
 }
 
+impl Default for Question {
+    fn default() -> Self {
+        Self {
+            number: 0,
+            text: String::new(),
+            answers: vec![],
+            reading: None,
+            category: String::new(),
+        }
+    }
+}
+
 #[derive(Debug, Eq, PartialEq)]
 pub struct Answer {
     text: String,
     is_correct: bool,
+}
+
+impl Default for Answer {
+    fn default() -> Self {
+        Self {
+            text: String::new(),
+            is_correct: false,
+        }
+    }
 }
 
 #[derive(Debug, Eq, PartialEq)]
