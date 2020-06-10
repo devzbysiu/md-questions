@@ -3,7 +3,7 @@
   <h1><code>md-questions</code></h1>
 
   <p>
-    <strong>CHANGEME</strong>
+    <strong>Parses markdown do get questions based on a convention</strong>
   </p>
 
   <p>
@@ -37,9 +37,20 @@
 
 # <p id="about">About</p>
 
-</p>
+The idea is simple: you write questions in markdown file using some convention, then you can use this library to
+parse this markdown. Example markdown questions:
 
-## --- TODO ---
+![img](./res/images/question-structure.png)
+
+Reading section is optional. All the rest is required to correctly parse the markdown.
+
+Then you can read the questions as following:
+```rust
+let content = read_to_string("./QUESTIONS.md")?;
+let questions = Questions::from(content.as_str());
+
+println!("First question: {}", questions[0].text());
+```
 
 # <p id="installation">Installation</p>
 
