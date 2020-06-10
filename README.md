@@ -3,7 +3,7 @@
   <h1><code>md-questions</code></h1>
 
   <p>
-    <strong>Parses markdown do get questions based on a convention</strong>
+    <strong>Parses markdown to get questions based on a convention</strong>
   </p>
 
   <p>
@@ -24,8 +24,6 @@
     <a href="#about">About</a>
     <span> | </span>
     <a href="#installation">Installation</a>
-    <span> | </span>
-    <a href="#configuration">Configuration</a>
     <span> | </span>
     <a href="#license">License</a>
     <span> | </span>
@@ -49,16 +47,16 @@ Then you can read the questions as following:
 let content = read_to_string("./QUESTIONS.md")?;
 let questions = Questions::from(content.as_str());
 
-println!("First question: {}", questions[0].text());
+println!("First question: {}", &questions[0].text());
 ```
 
 # <p id="installation">Installation</p>
 
-## --- TODO ---
-
-# <p id="configuration">Configuration</p>
-
-## --- TODO ---
+Add
+```toml
+md_questions = "0.1.0"
+```
+to your `Cargo.toml`
 
 # <p id="license">License</p>
 
