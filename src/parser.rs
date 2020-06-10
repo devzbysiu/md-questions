@@ -11,7 +11,7 @@ use std::num::ParseIntError;
 
 #[allow(dead_code)] // TODO: remove
 fn question(i: &str) -> IResult<&str, Question> {
-    let (i, number) = question_header(i)?;
+    let (i, (number, category)) = question_header(i)?;
     let (i, _) = new_line(i)?;
     let (i, text) = paragraph(i)?;
     let (i, _) = new_line(i)?;
@@ -21,9 +21,6 @@ fn question(i: &str) -> IResult<&str, Question> {
     let (i, answers) = answers(i)?;
     let (i, _) = new_line(i)?;
     // let (i, _) = new_line(i)?; // TODO: this should be here to be consistent
-    let (i, category) = category(i)?;
-    let (i, _) = new_line(i)?;
-    let (i, _) = new_line(i)?;
     let (i, _) = reading_header(i)?;
     let (i, _) = new_line(i)?;
     let (i, reading) = reading(i)?;
@@ -41,9 +38,16 @@ fn question(i: &str) -> IResult<&str, Question> {
     ))
 }
 
-fn question_header(i: &str) -> IResult<&str, u32> {
-    let (i, (_, num)) = tuple((tag("## Question "), map_res(digit1, to_int)))(i)?;
-    Ok((i, num))
+fn question_header(i: &str) -> IResult<&str, (u32, String)> {
+    let (i, (_, num, _, _, category, _)) = tuple((
+        tag("## Question "),
+        map_res(digit1, to_int),
+        char(' '),
+        char('`'),
+        take_until("`"),
+        char('`'),
+    ))(i)?;
+    Ok((i, (num, category.into())))
 }
 
 fn to_int(i: &str) -> Result<u32, ParseIntError> {
@@ -82,11 +86,6 @@ fn answer_checkbox(i: &str) -> IResult<&str, &str> {
     alt((tag("- [ ]"), tag("- [x]")))(i)
 }
 
-fn category(i: &str) -> IResult<&str, String> {
-    let (i, (_, category)) = tuple((tag("> "), line))(i)?;
-    Ok((i, category))
-}
-
 fn reading_header(i: &str) -> IResult<&str, Option<&str>> {
     opt(tag("## Reading"))(i)
 }
@@ -102,15 +101,15 @@ fn reading(i: &str) -> IResult<&str, Option<String>> {
 #[cfg(test)]
 mod test {
     use super::{
-        answer, answer_checkbox, answers, answers_header, category, line, new_line,
-        question_header, reading, reading_header,
+        answer, answer_checkbox, answers, answers_header, line, new_line, question_header, reading,
+        reading_header,
     };
     use crate::parser::question;
     use crate::{Answer, Question};
 
     #[test]
     fn test_question_parser() {
-        let input = r#"## Question 1
+        let input = r#"## Question 1 `Templates and Components`
 Some text of the question.
 Next part of the question.
 
@@ -119,8 +118,6 @@ Next part of the question.
 - [ ] Create a new custom component from scratch.
 - [ ] Overlay the teaser core component.
 - [x] Inherit from the teaser core component.
-
-> Templates and Components
 
 ## Reading
 - [here](reading/question-3-reading.md)
@@ -160,8 +157,11 @@ Next part of the question.
 
     #[test]
     fn test_question_header_parser() {
-        let input = "## Question 1";
-        assert_eq!(question_header(input), Ok(("", 1)));
+        let input = "## Question 1 `Templates and Components`";
+        assert_eq!(
+            question_header(input),
+            Ok(("", (1, "Templates and Components".into())))
+        );
     }
 
     #[test]
@@ -252,16 +252,6 @@ Next part of the question.
                     }
                 ]
             ))
-        );
-    }
-
-    #[test]
-    fn test_category_parser() {
-        let input = r#"> Templates and Components
-"#;
-        assert_eq!(
-            category(input),
-            Ok(("\n", "Templates and Components".into()))
         );
     }
 
