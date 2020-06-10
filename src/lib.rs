@@ -5,7 +5,7 @@ struct Question {
     number: u32,
     text: String,
     answers: Vec<Answer>,
-    reading: Option<Reading>,
+    reading: Option<String>,
     category: String,
 }
 
@@ -13,9 +13,4 @@ struct Question {
 struct Answer {
     text: String,
     is_correct: bool,
-}
-
-#[derive(Debug, Eq, PartialEq)]
-struct Reading {
-    url: String,
 }

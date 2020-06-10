@@ -3,7 +3,7 @@ use crate::Question;
 use nom::branch::alt;
 use nom::bytes::complete::{tag, take_until};
 use nom::character::complete::{char, digit1};
-use nom::combinator::map_res;
+use nom::combinator::{map_res, opt};
 use nom::multi::many_m_n;
 use nom::sequence::tuple;
 use nom::IResult;
@@ -17,16 +17,25 @@ fn question(i: &str) -> IResult<&str, Question> {
     let (i, _) = new_line(i)?;
     let (i, _) = new_line(i)?;
     let (i, _) = answers_header(i)?;
+    let (i, _) = new_line(i)?;
     let (i, answers) = answers(i)?;
     let (i, _) = new_line(i)?;
+    // let (i, _) = new_line(i)?; // TODO: this should be here to be consistent
     let (i, category) = category(i)?;
+    let (i, _) = new_line(i)?;
+    let (i, _) = new_line(i)?;
+    let (i, _) = reading_header(i)?;
+    let (i, _) = new_line(i)?;
+    let (i, reading) = reading(i)?;
+    let (i, _) = new_line(i)?;
+    let (i, _) = new_line(i)?;
     Ok((
         i,
         Question {
             number,
             text,
             answers,
-            reading: None,
+            reading,
             category,
         },
     ))
@@ -56,8 +65,7 @@ fn line(i: &str) -> IResult<&str, String> {
 }
 
 fn answers_header(i: &str) -> IResult<&str, &str> {
-    let (i, (header, _)) = tuple((tag("## Answers"), char('\n')))(i)?;
-    Ok((i, header))
+    tag("## Answers")(i)
 }
 
 fn answers(i: &str) -> IResult<&str, Vec<Answer>> {
@@ -79,10 +87,23 @@ fn category(i: &str) -> IResult<&str, String> {
     Ok((i, category))
 }
 
+fn reading_header(i: &str) -> IResult<&str, Option<&str>> {
+    opt(tag("## Reading"))(i)
+}
+
+fn reading(i: &str) -> IResult<&str, Option<String>> {
+    let (i, reading) = opt(tuple((tag("- [here]("), take_until(")"), tag(")"))))(i)?;
+    match reading {
+        Some((_, txt, _)) => Ok((i, Some(txt.into()))),
+        None => Ok((i, None)),
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::{
-        answer, answer_checkbox, answers, answers_header, category, line, new_line, question_header,
+        answer, answer_checkbox, answers, answers_header, category, line, new_line,
+        question_header, reading, reading_header,
     };
     use crate::parser::question;
     use crate::{Answer, Question};
@@ -100,11 +121,15 @@ Next part of the question.
 - [x] Inherit from the teaser core component.
 
 > Templates and Components
+
+## Reading
+- [here](reading/question-3-reading.md)
+
 "#;
         assert_eq!(
             question(input),
             Ok((
-                "\n",
+                "",
                 Question {
                     number: 1,
                     text: "Some text of the question.\nNext part of the question.".into(),
@@ -126,7 +151,7 @@ Next part of the question.
                             is_correct: true,
                         },
                     ],
-                    reading: None,
+                    reading: Some("reading/question-3-reading.md".into()),
                     category: "Templates and Components".into()
                 }
             ))
@@ -186,7 +211,7 @@ Next part of the question.
     fn test_answers_header_parser() {
         let input = r#"## Answers
 "#;
-        assert_eq!(answers_header(input), Ok(("", "## Answers")))
+        assert_eq!(answers_header(input), Ok(("\n", "## Answers")))
     }
 
     #[test]
@@ -227,7 +252,7 @@ Next part of the question.
                     }
                 ]
             ))
-        )
+        );
     }
 
     #[test]
@@ -237,6 +262,32 @@ Next part of the question.
         assert_eq!(
             category(input),
             Ok(("\n", "Templates and Components".into()))
-        )
+        );
+    }
+
+    #[test]
+    fn test_reading_header_parser() {
+        let reading_header_present = r#"## Reading
+"#;
+        assert_eq!(
+            reading_header(reading_header_present),
+            Ok(("\n", Some("## Reading")))
+        );
+
+        let lack_of_header = r#""#;
+        assert_eq!(reading_header(lack_of_header), Ok(("", None)))
+    }
+
+    #[test]
+    fn test_reading_parser() {
+        let reading_present = r#"- [here](reading/question-3-reading.md)
+"#;
+        assert_eq!(
+            reading(reading_present),
+            Ok(("\n", Some("reading/question-3-reading.md".into())))
+        );
+
+        // let lack_of_reading = r#""#;
+        // assert_eq!(reading_header(lack_of_reading), Ok(("", None)))
     }
 }
