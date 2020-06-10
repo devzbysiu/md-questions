@@ -26,6 +26,9 @@ fn question(i: &str) -> IResult<&str, Question> {
     let (i, reading) = reading(i)?;
     let (i, _) = new_line(i)?;
     let (i, _) = new_line(i)?;
+    let (i, _) = horizontal_rule(i)?;
+    let (i, _) = new_line(i)?;
+    let (i, _) = new_line(i)?;
     Ok((
         i,
         Question {
@@ -98,11 +101,15 @@ fn reading(i: &str) -> IResult<&str, Option<String>> {
     }
 }
 
+fn horizontal_rule(i: &str) -> IResult<&str, &str> {
+    tag("---")(i)
+}
+
 #[cfg(test)]
 mod test {
     use super::{
-        answer, answer_checkbox, answers, answers_header, line, new_line, question_header, reading,
-        reading_header,
+        answer, answer_checkbox, answers, answers_header, horizontal_rule, line, new_line,
+        question_header, reading, reading_header,
     };
     use crate::parser::question;
     use crate::{Answer, Question};
@@ -121,6 +128,8 @@ Next part of the question.
 
 ## Reading
 - [here](reading/question-3-reading.md)
+
+---
 
 "#;
         assert_eq!(
@@ -277,7 +286,14 @@ Next part of the question.
             Ok(("\n", Some("reading/question-3-reading.md".into())))
         );
 
-        // let lack_of_reading = r#""#;
-        // assert_eq!(reading_header(lack_of_reading), Ok(("", None)))
+        let lack_of_reading = r#""#;
+        assert_eq!(reading(lack_of_reading), Ok(("", None)))
+    }
+
+    #[test]
+    fn test_horizontal_rule_parser() {
+        let input = r#"---
+"#;
+        assert_eq!(horizontal_rule(input), Ok(("\n", "---")));
     }
 }
