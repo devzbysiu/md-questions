@@ -13,7 +13,7 @@ use std::num::ParseIntError;
 fn question(i: &str) -> IResult<&str, Question> {
     let (i, number) = question_header(i)?;
     let (i, _) = new_line(i)?;
-    let (i, text) = text(i)?;
+    let (i, text) = paragraph(i)?;
     let (i, _) = new_line(i)?;
     let (i, _) = new_line(i)?;
     let (i, _) = answers_header(i)?;
@@ -45,7 +45,12 @@ fn new_line(i: &str) -> IResult<&str, char> {
     char('\n')(i)
 }
 
-fn text(i: &str) -> IResult<&str, String> {
+fn paragraph(i: &str) -> IResult<&str, String> {
+    let (i, text) = take_until("\n\n")(i)?;
+    Ok((i, text.into()))
+}
+
+fn line(i: &str) -> IResult<&str, String> {
     let (i, text) = take_until("\n")(i)?;
     Ok((i, text.into()))
 }
@@ -60,11 +65,8 @@ fn answers(i: &str) -> IResult<&str, Vec<Answer>> {
 }
 
 fn answer(i: &str) -> IResult<&str, Answer> {
-    let (i, (checkbox, _, text, _)) = tuple((answer_checkbox, char(' '), text, char('\n')))(i)?;
-    let mut is_correct = false;
-    if checkbox == "- [x]" {
-        is_correct = true;
-    }
+    let (i, (checkbox, _, text, _)) = tuple((answer_checkbox, char(' '), line, char('\n')))(i)?;
+    let is_correct = checkbox == "- [x]";
     Ok((i, Answer { text, is_correct }))
 }
 
@@ -73,14 +75,14 @@ fn answer_checkbox(i: &str) -> IResult<&str, &str> {
 }
 
 fn category(i: &str) -> IResult<&str, String> {
-    let (i, (_, category)) = tuple((tag("> "), text))(i)?;
+    let (i, (_, category)) = tuple((tag("> "), line))(i)?;
     Ok((i, category))
 }
 
 #[cfg(test)]
 mod test {
     use super::{
-        answer, answer_checkbox, answers, answers_header, category, new_line, question_header, text,
+        answer, answer_checkbox, answers, answers_header, category, line, new_line, question_header,
     };
     use crate::parser::question;
     use crate::{Answer, Question};
@@ -88,7 +90,8 @@ mod test {
     #[test]
     fn test_question_parser() {
         let input = r#"## Question 1
-Some text of the question
+Some text of the question.
+Next part of the question.
 
 ## Answers
 - [ ] Use and configure the teaser core component.
@@ -104,7 +107,7 @@ Some text of the question
                 "\n",
                 Question {
                     number: 1,
-                    text: "Some text of the question".into(),
+                    text: "Some text of the question.\nNext part of the question.".into(),
                     answers: vec![
                         Answer {
                             text: "Use and configure the teaser core component.".into(),
@@ -144,18 +147,18 @@ Some text of the question
     }
 
     #[test]
-    fn test_text_parser() {
+    fn test_line_parser() {
         let input = r#"Some text here
 "#;
-        assert_eq!(text(input), Ok(("\n", "Some text here".into())));
+        assert_eq!(line(input), Ok(("\n", "Some text here".into())));
     }
 
     #[test]
     fn test_answer_parser() {
-        let input = r#"- [ ] Some answer
+        let incorrect_answer = r#"- [ ] Some answer
 "#;
         assert_eq!(
-            answer(input),
+            answer(incorrect_answer),
             Ok((
                 "",
                 Answer {
@@ -165,10 +168,10 @@ Some text of the question
             ))
         );
 
-        let input = r#"- [x] Some answer
+        let correct_answer = r#"- [x] Some answer
 "#;
         assert_eq!(
-            answer(input),
+            answer(correct_answer),
             Ok((
                 "",
                 Answer {
@@ -188,10 +191,10 @@ Some text of the question
 
     #[test]
     fn test_answer_checkbox() {
-        let input = "- [ ]";
-        assert_eq!(answer_checkbox(input), Ok(("", "- [ ]")));
-        let input = "- [x]";
-        assert_eq!(answer_checkbox(input), Ok(("", "- [x]")));
+        let unchecked = "- [ ]";
+        assert_eq!(answer_checkbox(unchecked), Ok(("", "- [ ]")));
+        let checked = "- [x]";
+        assert_eq!(answer_checkbox(checked), Ok(("", "- [x]")));
     }
 
     #[test]
