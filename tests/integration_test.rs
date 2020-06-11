@@ -3,7 +3,9 @@ use std::fs::read_to_string;
 
 #[test]
 fn test_reading_questions() {
-    let content = read_to_string("res/QUESTIONS.md").unwrap();
+    let content =
+        read_to_string("/home/zbychu/learning/aem-sites-exam/ace-aem-sites-developer/QUESTIONS.md")
+            .unwrap();
     let questions = Questions::from(content.as_str());
     let first_question = &questions[0];
 
@@ -16,5 +18,18 @@ fn test_reading_questions() {
             .with_answer(Answer::new("Overlay the teaser core component.", false))
             .with_answer(Answer::new("Inherit from the teaser core component.", true))
             .with_category("Templates and Components")
+    );
+
+    let last_question = &questions[questions.len() - 1];
+    assert_eq!(last_question,
+        &Question::default()
+            .with_number(17)
+            .with_text("A developer is creating templates and/or components using CRXDE Lite. The developer needs to check the files into source control. Which tool should the developer use to achieve this goal?")
+            .with_answer(Answer::new("vlt command", true))
+            .with_answer(Answer::new("Content Explorer", false))
+            .with_answer(Answer::new("http://localhost:4502/crx/checkout", false))
+            .with_answer(Answer::new("mvn command", false))
+            .with_category("Templates and Components")
+            .with_reading("https://docs.adobe.com/content/help/en/experience-manager-65/developing/devtools/ht-vlttool.html")
     );
 }

@@ -28,6 +28,10 @@ impl Questions {
     fn new(questions: Vec<Question>) -> Self {
         Self { questions }
     }
+
+    pub fn len(&self) -> usize {
+        self.questions.len()
+    }
 }
 
 impl Default for Questions {
