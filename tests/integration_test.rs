@@ -20,16 +20,31 @@ fn test_reading_questions() {
             .with_category("Templates and Components")
     );
 
-    let last_question = &questions[questions.len() - 1];
-    assert_eq!(last_question,
+    let multiline_question = &questions[17];
+    assert_eq!(multiline_question,
         &Question::default()
-            .with_number(17)
-            .with_text("A developer is creating templates and/or components using CRXDE Lite. The developer needs to check the files into source control. Which tool should the developer use to achieve this goal?")
-            .with_answer(Answer::new("vlt command", true))
-            .with_answer(Answer::new("Content Explorer", false))
-            .with_answer(Answer::new("http://localhost:4502/crx/checkout", false))
-            .with_answer(Answer::new("mvn command", false))
-            .with_category("Templates and Components")
-            .with_reading("https://docs.adobe.com/content/help/en/experience-manager-65/developing/devtools/ht-vlttool.html")
+            .with_number(18)
+            .with_text(r#"A developer is creating a new OSGi bundle `com.custom.package.b` to expose new services. `com.custom.package.a` is already installed and active in the system and has the following package definition:
+  ```
+  Export-Package: com.custom.package.a;version="2.0"
+  Import-Package: com.sample.package.a;version="[1,2]"
+  Classpath: .,com.sample.package.b-3.0.jar
+  ```
+  The system console shows the following package availability:
+  ```
+  com.sample.package.a;version="1.5"
+  com.sample.package.c;version="3.0"
+  ```
+  Bundle com.custom.package.b to be installed has the following package definition:
+  ```
+  Export-Package: com.custom.package.b;version="1.0"
+  Import-Package: com.custom.package.a;version="[1,2)",com.sample.package.b;version="[3.0,3.0]",com.sample.package.c;version="[2,3)"
+  ```
+  What will happen when the developer uploads the bundle com.custom.package.b into the system?"#)
+            .with_answer(Answer::new("The bundle will install but fail the activation due to unsatisfied dependencies `com.sample.package.b` and `com.sample.package.c`.", true))
+            .with_answer(Answer::new("The bundle will install but fail the activation due to unsatisfied dependency `com.sample.package.c`.", false))
+            .with_answer(Answer::new("The bundle will install and activate successfully.", false))
+            .with_answer(Answer::new("The bundle will install but fail the activation due to unsatisfied dependency `com.sample.package.b`.", false))
+            .with_category("OSGi Services")
     );
 }
