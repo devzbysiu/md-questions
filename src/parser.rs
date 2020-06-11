@@ -24,9 +24,7 @@ fn question(i: &str) -> IResult<&str, Question> {
     let (i, answers) = answers(i)?;
     let (i, _) = new_line(i)?;
     // let (i, _) = new_line(i)?; // TODO: this should be here to be consistent
-    let (i, _) = opt_reading_header(i)?;
-    let (i, _) = opt_new_line(i)?;
-    let (i, reading) = opt_reading(i)?;
+    let (i, reading) = opt_reading_header(i)?;
     let (i, _) = opt_new_line(i)?;
     let (i, _) = opt_new_line(i)?;
     let (i, _) = horizontal_rule(i)?;
@@ -96,12 +94,8 @@ fn answer_checkbox(i: &str) -> IResult<&str, &str> {
     alt((tag("- [ ]"), tag("- [x]")))(i)
 }
 
-fn opt_reading_header(i: &str) -> IResult<&str, Option<&str>> {
-    opt(tag("## Reading"))(i)
-}
-
-fn opt_reading(i: &str) -> IResult<&str, Option<String>> {
-    let (i, reading) = opt(tuple((tag("- [here]("), take_until(")"), tag(")"))))(i)?;
+fn opt_reading_header(i: &str) -> IResult<&str, Option<String>> {
+    let (i, reading) = opt(tuple((tag("## [Reading]("), take_until(")"), tag(")"))))(i)?;
     match reading {
         Some((_, txt, _)) => Ok((i, Some(txt.into()))),
         None => Ok((i, None)),
@@ -116,7 +110,7 @@ fn horizontal_rule(i: &str) -> IResult<&str, &str> {
 mod test {
     use super::{
         answer, answer_checkbox, answers, answers_header, horizontal_rule, line, new_line,
-        opt_reading, opt_reading_header, question_header, questions,
+        opt_reading_header, question_header, questions,
     };
     use crate::parser::question;
     use crate::{Answer, Question, Questions};
@@ -155,8 +149,7 @@ The structure section of an editable template has a locked component. What happe
 - [ ] The content is deleted after confirmation from the template author.
 - [ ] The content is copied to the initial section of the editable template.
 
-## Reading
-- [here](reading/question-3-reading.md)
+## [Reading](reading/question-3-reading.md)
 
 ---
 
@@ -208,8 +201,7 @@ A developer needs to create a banner component. This component shows an image ac
 - [ ] Overlay the teaser core component.
 - [x] Inherit from the teaser core component.
 
-## Reading
-- [here](reading/question-3-reading.md)
+## [Reading](reading/question-3-reading.md)
 
 ---
 
@@ -299,20 +291,10 @@ A developer needs to create a banner component. This component shows an image ac
     #[test]
     fn test_reading_header_parser() {
         assert_eq!(
-            opt_reading_header("## Reading\n"),
-            Ok(("\n", Some("## Reading")))
-        );
-        assert_eq!(opt_reading_header(""), Ok(("", None)))
-    }
-
-    #[test]
-    fn test_reading_parser() {
-        assert_eq!(
-            opt_reading("- [here](reading/question-3-reading.md)\n"),
+            opt_reading_header("## [Reading](reading/question-3-reading.md)\n"),
             Ok(("\n", Some("reading/question-3-reading.md".into())))
         );
-
-        assert_eq!(opt_reading(""), Ok(("", None)))
+        assert_eq!(opt_reading_header(""), Ok(("", None)))
     }
 
     #[test]

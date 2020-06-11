@@ -36,9 +36,35 @@
 # <p id="about">About</p>
 
 The idea is simple: you write questions in markdown file using some convention, then you can use this library to
-parse this markdown. Example markdown questions:
+parse this markdown. Here are example questions with question structure description:
 
-![img](./res/images/question-structure.png)
+```markdown
+## Question 1 `Programming Language`             // 1. Question Header: ## Question <number> `<category>`
+What language was used to write this library?    // 2. Question Content. Can be multi-line.
+Pick one.                                        //
+                                                 // 3. New line.
+## Answers                                       // 4. Answers Header: ## Answers
+- [x] Rust                                       // 5. Answers.
+- [ ] Java                                       //    Only single-line answers.
+- [ ] Kotlin                                     //    Correct answer: - [x] <text>
+- [ ] Go                                         //    Incorrect answer: - [ ] <text>
+                                                 // 6. New line.
+## [Reading](reading/question-1.md)              // 7. Optional Reading Header: ## [Reading](url)
+                                                 // 8. New line.
+---                                              // 9. Questions Separator.
+                                                 // 10. New line.
+## Question 2 `Clean Code`
+What letter S in SOLID acronym stands for?
+
+## Answers
+- [ ] Substitution Principle
+- [ ] Sub Dependency Principle
+- [x] Single Responsibility Principle
+- [ ] System Inversion Principle
+- [ ] Super Closed Principle
+
+
+```
 
 Reading section is optional. All the rest is required to correctly parse the markdown.
 
