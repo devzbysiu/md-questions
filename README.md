@@ -49,7 +49,7 @@ Pick one.                                        //
 - [ ] Kotlin                                     //    Correct answer: - [x] <text>
 - [ ] Go                                         //    Incorrect answer: - [ ] <text>
                                                  // 6. New line.
-## [Reading](reading/question-1.md)              // 7. Optional Reading Header: ## [Reading](url)
+## [Reading](reading/question-1.md)              // 7. Optional Reading Header: ## [Reading](<url>)
                                                  // 8. New line.
 ---                                              // 9. Questions Separator.
                                                  // 10. New line.
