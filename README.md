@@ -7,7 +7,7 @@
   </p>
 
   <p>
-    <img src="https://github.com/devzbysiu/md-questions/workflows/CI/badge.svg" alt="CI status
+    <img src="https://github.com/devzbysiu/md-questions/workflows/Main/badge.svg" alt="CI status
     badge" />
     <a href="https://codecov.io/gh/devzbysiu/md-questions">
       <img src="https://img.shields.io/codecov/c/github/devzbysiu/md-questions?color=%2388C0D0&logoColor=%234C566A&style=flat-square&token=bfdc4b9d55534910ae48fba0b8e984d0" alt="Code coverage"/>
