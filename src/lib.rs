@@ -29,8 +29,14 @@ impl Questions {
         Self { questions }
     }
 
+    #[must_use]
     pub fn len(&self) -> usize {
         self.questions.len()
+    }
+
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.questions.is_empty()
     }
 }
 

@@ -3,9 +3,7 @@ use std::fs::read_to_string;
 
 #[test]
 fn test_reading_questions() {
-    let content =
-        read_to_string("/home/zbychu/learning/aem-sites-exam/ace-aem-sites-developer/QUESTIONS.md")
-            .unwrap();
+    let content = read_to_string("res/QUESTIONS.md").unwrap();
     let questions = Questions::from(content.as_str());
     let first_question = &questions[0];
 
@@ -47,4 +45,6 @@ fn test_reading_questions() {
             .with_answer(Answer::new("The bundle will install but fail the activation due to unsatisfied dependency `com.sample.package.b`.", false))
             .with_category("OSGi Services")
     );
+
+    assert_eq!(questions.len(), 27);
 }
