@@ -38,6 +38,11 @@ impl Questions {
     pub fn is_empty(&self) -> bool {
         self.questions.is_empty()
     }
+
+    #[must_use]
+    pub fn questions(&self) -> &[Question] {
+        &self.questions
+    }
 }
 
 impl Default for Questions {
@@ -139,7 +144,7 @@ impl Question {
     }
 
     #[must_use]
-    pub fn answer(&self) -> &[Answer] {
+    pub fn answers(&self) -> &[Answer] {
         &self.answers
     }
 
@@ -149,8 +154,18 @@ impl Question {
     }
 
     #[must_use]
-    pub fn categor(&self) -> String {
+    pub fn category(&self) -> String {
         self.category.clone()
+    }
+
+    #[must_use]
+    pub fn no_answers(&self) -> usize {
+        self.answers.len()
+    }
+
+    #[must_use]
+    pub fn answer(&self, idx: usize) -> &Answer {
+        self.answers.get(idx).unwrap() // TODO: get rid of unwrap
     }
 }
 
@@ -192,6 +207,14 @@ impl Answer {
             text: text.into(),
             is_correct,
         }
+    }
+
+    pub fn text(&self) -> String {
+        self.text.clone()
+    }
+
+    pub fn is_correct(&self) -> bool {
+        self.is_correct
     }
 }
 
