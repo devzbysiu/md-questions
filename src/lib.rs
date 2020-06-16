@@ -92,7 +92,7 @@ impl Index<usize> for Questions {
 pub struct Question {
     /// Number of the question in order.
     number: u32,
-    /// Questions content.
+    /// Question's content.
     text: String,
     /// Possible answers. Multiple answers can be correct.
     answers: Vec<Answer>,
