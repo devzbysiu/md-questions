@@ -209,10 +209,12 @@ impl Answer {
         }
     }
 
+    #[must_use]
     pub fn text(&self) -> String {
         self.text.clone()
     }
 
+    #[must_use]
     pub fn is_correct(&self) -> bool {
         self.is_correct
     }
