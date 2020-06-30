@@ -2,25 +2,25 @@
 
   <h1><code>md-questions</code></h1>
 
-  <p>
+  <h3>
     <strong>Parses markdown to get questions based on a convention</strong>
-  </p>
+  </h3>
 
   <p>
     <img src="https://github.com/devzbysiu/md-questions/workflows/Main/badge.svg" alt="CI status
     badge" />
     <a href="https://codecov.io/gh/devzbysiu/md-questions">
-      <img src="https://img.shields.io/codecov/c/github/devzbysiu/md-questions?color=%2388C0D0&logoColor=%234C566A&style=flat-square&token=bfdc4b9d55534910ae48fba0b8e984d0" alt="Code coverage"/>
+      <img src="https://img.shields.io/codecov/c/github/devzbysiu/md-questions?style=for-the-badge&token=bfdc4b9d55534910ae48fba0b8e984d0" alt="Code coverage"/>
     </a>
     <a href="https://crates.io/crates/md-questions">
-      <img src="https://img.shields.io/crates/l/md-questions?color=%2388C0D0&logoColor=%234C566A&style=flat-square" alt="License"/>
+      <img src="https://img.shields.io/crates/l/md-questions?style=for-the-badge" alt="License"/>
     </a>
     <a href="https://docs.rs/md-questions">
-      <img src="https://img.shields.io/badge/docs-latest-blue.svg?color=%2388C0D0&logoColor=%234C566A&style=flat-square" alt="docs.rs docs" />
+      <img src="https://img.shields.io/badge/docs-latest-blue.svg?style=for-the-badge" alt="docs.rs docs" />
     </a>
   </p>
 
-  <h4>
+  <h3>
     <a href="#about">About</a>
     <span> | </span>
     <a href="#installation">Installation</a>
@@ -30,7 +30,7 @@
     <a href="#contribution">Contribution</a>
   </h3>
 
-  <sub>Built with 🦀</sub>
+  <sub><h4>Built with 🦀</h4></sub>
 </div>
 
 # <p id="about">About</p>
