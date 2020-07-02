@@ -46,5 +46,5 @@ fn test_reading_questions() {
             .with_category("OSGi Services")
     );
 
-    assert_eq!(questions.len(), 27);
+    assert_eq!(questions.len(), 58);
 }
