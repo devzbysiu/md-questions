@@ -739,7 +739,7 @@ How should a developer configure the replication agent to flush the dispatcher c
 ---
 
 ## Question 55 `Troubleshooting AEM projects`
-Which log file should a developer use to search for exception stack traces?:
+Which log file should a developer use to search for exception stack traces?
 
 ## Answers
 - [ ] <aem-install>/crx-quickstart/logs/request.log

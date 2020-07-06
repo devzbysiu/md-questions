@@ -167,6 +167,16 @@ impl Question {
     pub fn answer(&self, idx: usize) -> &Answer {
         self.answers.get(idx).unwrap() // TODO: get rid of unwrap
     }
+
+    #[must_use]
+    pub fn is_multi(&self) -> bool {
+        let correct_answers = self
+            .answers()
+            .iter()
+            .filter(|&answer| answer.is_correct())
+            .count();
+        correct_answers > 1
+    }
 }
 
 impl Default for Question {
