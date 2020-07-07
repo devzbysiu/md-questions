@@ -1,4 +1,5 @@
 use crate::{Answer, MdQuestion, MdQuestions};
+use log::debug;
 use nom::branch::alt;
 use nom::bytes::complete::{tag, take_until};
 use nom::character::complete::{char, digit1};
@@ -14,6 +15,7 @@ pub(crate) fn questions(i: &str) -> IResult<&str, MdQuestions> {
 }
 
 fn question(i: &str) -> IResult<&str, MdQuestion> {
+    let _ = pretty_env_logger::try_init();
     let (i, (number, category)) = question_header(i)?;
     let (i, _) = new_line(i)?;
     let (i, text) = paragraph(i)?;
@@ -30,19 +32,39 @@ fn question(i: &str) -> IResult<&str, MdQuestion> {
     let (i, _) = horizontal_rule(i)?;
     let (i, _) = new_line(i)?;
     let (i, _) = new_line(i)?;
-    Ok((
-        i,
-        MdQuestion {
-            number,
-            text,
-            answers,
-            reading,
-            category,
-        },
-    ))
+    let question = MdQuestion {
+        number,
+        text,
+        answers,
+        reading,
+        category,
+    };
+    debug!("full question: {:#?}", question);
+    Ok((i, question))
 }
 
 fn question_header(i: &str) -> IResult<&str, (u32, String)> {
+    let mut i = i;
+    let (input, num, category) = loop {
+        debug!("loop with input: {}", i);
+        let (input, (num, category)) = number_and_category(i)?;
+        debug!("found category: {}", category);
+        if category.to_lowercase() != "ignore" {
+            break (input, num, category);
+        }
+        debug!("ignoring");
+        let (input, _) = take_until("---")(input)?;
+        let (input, _) = horizontal_rule(input)?;
+        let (input, _) = new_line(input)?;
+        let (input, _) = new_line(input)?;
+        debug!("rest of te input");
+        i = input;
+    };
+
+    Ok((input, (num, category)))
+}
+
+fn number_and_category(i: &str) -> IResult<&str, (u32, String)> {
     let (i, (_, num, _, _, category, _)) = tuple((
         tag("## Question "),
         map_res(digit1, to_int),
@@ -117,6 +139,7 @@ mod test {
 
     #[test]
     fn test_questions_parser() {
+        let _ = pretty_env_logger::try_init();
         let input = r#"## Question 1 `Templates and Components`
 A developer needs to create a banner component. This component shows an image across the full width of the page. A title is shown on top of the image. This text can be aligned to the left, middle, or right. The core components feature a teaser component which matches almost all requirements, but not all. What is the most maintainable way for the developer to implement these requirements?
 
@@ -192,6 +215,7 @@ The structure section of an editable template has a locked component. What happe
 
     #[test]
     fn test_question_parser() {
+        let _ = pretty_env_logger::try_init();
         let input = r#"## Question 1 `Templates and Components`
 A developer needs to create a banner component. This component shows an image across the full width of the page. A title is shown on top of the image. This text can be aligned to the left, middle, or right. The core components feature a teaser component which matches almost all requirements, but not all. What is the most maintainable way for the developer to implement these requirements?
 
@@ -225,6 +249,7 @@ A developer needs to create a banner component. This component shows an image ac
 
     #[test]
     fn test_question_header_parser() {
+        let _ = pretty_env_logger::try_init();
         assert_eq!(
             question_header("## Question 1 `Templates and Components`"),
             Ok(("", (1, "Templates and Components".into())))
@@ -233,11 +258,13 @@ A developer needs to create a banner component. This component shows an image ac
 
     #[test]
     fn test_new_line_parser() {
+        let _ = pretty_env_logger::try_init();
         assert_eq!(new_line("\n"), Ok(("", '\n')));
     }
 
     #[test]
     fn test_line_parser() {
+        let _ = pretty_env_logger::try_init();
         assert_eq!(
             line("Some text here\n"),
             Ok(("\n", "Some text here".into()))
@@ -246,6 +273,7 @@ A developer needs to create a banner component. This component shows an image ac
 
     #[test]
     fn test_answer_parser() {
+        let _ = pretty_env_logger::try_init();
         assert_eq!(
             answer("- [ ] Some answer\n"),
             Ok(("", Answer::new("Some answer", false)))
@@ -258,17 +286,20 @@ A developer needs to create a banner component. This component shows an image ac
 
     #[test]
     fn test_answers_header_parser() {
+        let _ = pretty_env_logger::try_init();
         assert_eq!(answers_header("## Answers\n"), Ok(("\n", "## Answers")))
     }
 
     #[test]
     fn test_answer_checkbox() {
+        let _ = pretty_env_logger::try_init();
         assert_eq!(answer_checkbox("- [ ]"), Ok(("", "- [ ]")));
         assert_eq!(answer_checkbox("- [x]"), Ok(("", "- [x]")));
     }
 
     #[test]
     fn test_answers_parser() {
+        let _ = pretty_env_logger::try_init();
         let input = r#"- [ ] Use and configure the teaser core component.
 - [ ] Create a new custom component from scratch.
 - [ ] Overlay the teaser core component.
@@ -290,6 +321,7 @@ A developer needs to create a banner component. This component shows an image ac
 
     #[test]
     fn test_reading_header_parser() {
+        let _ = pretty_env_logger::try_init();
         assert_eq!(
             opt_reading_header("## [Reading](reading/question-3-reading.md)\n"),
             Ok(("\n", Some("reading/question-3-reading.md".into())))
@@ -299,6 +331,7 @@ A developer needs to create a banner component. This component shows an image ac
 
     #[test]
     fn test_horizontal_rule_parser() {
+        let _ = pretty_env_logger::try_init();
         assert_eq!(horizontal_rule("---\n"), Ok(("\n", "---")));
     }
 }
