@@ -36,7 +36,7 @@
 # <p id="about">About</p>
 
 The idea is simple: you write questions in markdown file using some convention, then you can use this library to
-parse this markdown. Here are example questions with question structure description:
+parse this markdown. Here are example questions with description of question structure:
 
 ```markdown
 ## Question 1 `Programming Language`             // 1. Question Header: ## Question <number> `<category>`
@@ -63,6 +63,7 @@ What letter S in SOLID acronym stands for?
 - [ ] System Inversion Principle
 - [ ] Super Closed Principle
 
+---
 
 ```
 
@@ -75,6 +76,29 @@ let questions = Questions::from(content.as_str());
 
 println!("First question: {}", &questions[0].text());
 ```
+
+You can use special category `Ignore` which allows to skip the question.
+```markdown
+## Question 1 `Ignore`
+This multi-line aswers question is not yet supported.
+
+## Answers
+- [x] Multi-line
+      answer 1
+- [ ] Multi-line
+      answer 2
+- [ ] Multi-line
+      answer 3
+- [ ] Multi-line
+      answer 4
+
+## [Reading](reading/question-1.md)
+
+---
+
+```
+This way you can still
+parse the markdown but include questions which this library is not able to parse (yet).
 
 # <p id="installation">Installation</p>
 
