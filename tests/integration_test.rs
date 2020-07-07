@@ -1,14 +1,14 @@
-use md_questions::{Answer, Question, Questions};
+use md_questions::{Answer, MdQuestion, MdQuestions};
 use std::fs::read_to_string;
 
 #[test]
 fn test_reading_questions() {
     let content = read_to_string("res/QUESTIONS.md").unwrap();
-    let questions = Questions::from(content.as_str());
+    let questions = MdQuestions::from(content.as_str());
     let first_question = &questions[0];
 
     assert_eq!(first_question,
-        &Question::default()
+        &MdQuestion::default()
             .with_number(1)
             .with_text("A developer needs to create a banner component. This component shows an image across the full width of the page. A title is shown on top of the image. This text can be aligned to the left, middle, or right. The core components feature a teaser component which matches almost all requirements, but not all. What is the most maintainable way for the developer to implement these requirements?")
             .with_answer(Answer::new("Use and configure the teaser core component.", false))
@@ -20,7 +20,7 @@ fn test_reading_questions() {
 
     let multiline_question = &questions[17];
     assert_eq!(multiline_question,
-        &Question::default()
+        &MdQuestion::default()
             .with_number(18)
             .with_text(r#"A developer is creating a new OSGi bundle `com.custom.package.b` to expose new services. `com.custom.package.a` is already installed and active in the system and has the following package definition:
   ```
@@ -46,5 +46,5 @@ fn test_reading_questions() {
             .with_category("OSGi Services")
     );
 
-    assert_eq!(questions.len(), 58);
+    assert_eq!(questions.count(), 58);
 }

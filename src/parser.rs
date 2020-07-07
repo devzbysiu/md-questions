@@ -1,4 +1,4 @@
-use crate::{Answer, Question, Questions};
+use crate::{Answer, MdQuestion, MdQuestions};
 use nom::branch::alt;
 use nom::bytes::complete::{tag, take_until};
 use nom::character::complete::{char, digit1};
@@ -8,12 +8,12 @@ use nom::sequence::tuple;
 use nom::IResult;
 use std::num::ParseIntError;
 
-pub(crate) fn questions(i: &str) -> IResult<&str, Questions> {
+pub(crate) fn questions(i: &str) -> IResult<&str, MdQuestions> {
     let (i, questions) = many1(question)(i)?;
-    Ok((i, Questions::new(questions)))
+    Ok((i, MdQuestions::new(questions)))
 }
 
-fn question(i: &str) -> IResult<&str, Question> {
+fn question(i: &str) -> IResult<&str, MdQuestion> {
     let (i, (number, category)) = question_header(i)?;
     let (i, _) = new_line(i)?;
     let (i, text) = paragraph(i)?;
@@ -32,7 +32,7 @@ fn question(i: &str) -> IResult<&str, Question> {
     let (i, _) = new_line(i)?;
     Ok((
         i,
-        Question {
+        MdQuestion {
             number,
             text,
             answers,
@@ -113,7 +113,7 @@ mod test {
         opt_reading_header, question_header, questions,
     };
     use crate::parser::question;
-    use crate::{Answer, Question, Questions};
+    use crate::{Answer, MdQuestion, MdQuestions};
 
     #[test]
     fn test_questions_parser() {
@@ -158,8 +158,8 @@ The structure section of an editable template has a locked component. What happe
             questions(input),
             Ok((
                 "",
-                Questions::new(vec![
-                    Question::default()
+                MdQuestions::new(vec![
+                    MdQuestion::default()
                         .with_number(1)
                         .with_text("A developer needs to create a banner component. This component shows an image across the full width of the page. A title is shown on top of the image. This text can be aligned to the left, middle, or right. The core components feature a teaser component which matches almost all requirements, but not all. What is the most maintainable way for the developer to implement these requirements?")
                         .with_answer(Answer::new("Use and configure the teaser core component.", false))
@@ -167,7 +167,7 @@ The structure section of an editable template has a locked component. What happe
                         .with_answer(Answer::new("Overlay the teaser core component.", false))
                         .with_answer(Answer::new("Inherit from the teaser core component.", true))
                         .with_category("Templates and Components"),
-                    Question::default()
+                    MdQuestion::default()
                         .with_number(2)
                         .with_text("A developer is working on a complex project with multiple bundles. One bundle provides an OSGi service for other bundles. Which two options are necessary to ensure that the other bundles can reference that OSGi service? (Choose two.)")
                         .with_answer(Answer::new( "The bundles consuming the service need to import the fully qualified name of the service interface.", true))
@@ -176,7 +176,7 @@ The structure section of an editable template has a locked component. What happe
                         .with_answer(Answer::new("The bundle providing the service needs to contain an adequate SCR descriptor file.", false))
                         .with_answer(Answer::new("The bundle providing the service needs to export the java package of the service interface.", true))
                         .with_category("OSGi Services"),
-                    Question::default()
+                    MdQuestion::default()
                         .with_number(3)
                         .with_text("The structure section of an editable template has a locked component. What happens to the content of that component when a developer unlocks it?")
                         .with_answer(Answer::new("The content stays in the same place but it ignored on pages using the template.", false))
@@ -210,7 +210,7 @@ A developer needs to create a banner component. This component shows an image ac
             question(input),
             Ok((
                 "",
-                Question::default()
+                MdQuestion::default()
                     .with_number(1)
                     .with_text("A developer needs to create a banner component. This component shows an image across the full width of the page. A title is shown on top of the image. This text can be aligned to the left, middle, or right. The core components feature a teaser component which matches almost all requirements, but not all. What is the most maintainable way for the developer to implement these requirements?")
                     .with_answer(Answer::new("Use and configure the teaser core component.", false))

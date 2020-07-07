@@ -9,28 +9,28 @@ mod parser;
 /// ```
 /// # use std::error::Error;
 /// # use std::fs::read_to_string;
-/// use md_questions::Questions;
+/// use md_questions::MdQuestions;
 ///
 /// # fn main() -> Result<(), Box<dyn Error>> {
 /// let content = read_to_string("res/QUESTIONS.md")?;
-/// let questions = Questions::from(content.as_str());
+/// let questions = MdQuestions::from(content.as_str());
 /// let first_question = &questions[0];
 /// println!("First question: {}", first_question.text());
 /// # Ok(())
 /// # }
 /// ```
 #[derive(Debug, Eq, PartialEq)]
-pub struct Questions {
-    questions: Vec<Question>,
+pub struct MdQuestions {
+    questions: Vec<MdQuestion>,
 }
 
-impl Questions {
-    fn new(questions: Vec<Question>) -> Self {
+impl MdQuestions {
+    fn new(questions: Vec<MdQuestion>) -> Self {
         Self { questions }
     }
 
     #[must_use]
-    pub fn len(&self) -> usize {
+    pub fn count(&self) -> usize {
         self.questions.len()
     }
 
@@ -40,26 +40,26 @@ impl Questions {
     }
 
     #[must_use]
-    pub fn questions(&self) -> &[Question] {
+    pub fn questions(&self) -> &[MdQuestion] {
         &self.questions
     }
 }
 
-impl Default for Questions {
+impl Default for MdQuestions {
     fn default() -> Self {
         Self { questions: vec![] }
     }
 }
 
-impl From<&str> for Questions {
+impl From<&str> for MdQuestions {
     fn from(content: &str) -> Self {
         let (_, questions) = questions(content).expect("failed to parse questions");
         questions
     }
 }
 
-impl Index<usize> for Questions {
-    type Output = Question;
+impl Index<usize> for MdQuestions {
+    type Output = MdQuestion;
 
     fn index(&self, idx: usize) -> &Self::Output {
         self.questions
@@ -73,10 +73,10 @@ impl Index<usize> for Questions {
 /// Example of usage:
 /// ```
 /// # use std::error::Error;
-/// use md_questions::{Question, Answer};
+/// use md_questions::{MdQuestion, Answer};
 ///
 /// # fn main() -> Result<(), Box<dyn Error>> {
-/// let question = Question::default()
+/// let question = MdQuestion::default()
 ///     .with_number(1)
 ///     .with_text("Why the sky is blue?")
 ///     .with_answer(Answer::new("Because of oxygen", false))
@@ -88,8 +88,8 @@ impl Index<usize> for Questions {
 /// # Ok(())
 /// # }
 /// ```
-#[derive(Debug, Eq, PartialEq)]
-pub struct Question {
+#[derive(Debug, Eq, PartialEq, Clone)]
+pub struct MdQuestion {
     /// Number of the question in order.
     number: u32,
     /// Question's content.
@@ -102,7 +102,7 @@ pub struct Question {
     category: String,
 }
 
-impl Question {
+impl MdQuestion {
     #[must_use]
     pub fn with_number(mut self, number: u32) -> Self {
         self.number = number;
@@ -159,7 +159,7 @@ impl Question {
     }
 
     #[must_use]
-    pub fn no_answers(&self) -> usize {
+    pub fn answers_count(&self) -> usize {
         self.answers.len()
     }
 
@@ -179,7 +179,7 @@ impl Question {
     }
 }
 
-impl Default for Question {
+impl Default for MdQuestion {
     fn default() -> Self {
         Self {
             number: 0,
@@ -203,7 +203,7 @@ impl Default for Question {
 /// # Ok(())
 /// # }
 /// ```
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Clone)]
 pub struct Answer {
     /// Answer text.
     text: String,
