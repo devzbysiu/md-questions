@@ -136,6 +136,8 @@ mod test {
     };
     use crate::parser::question;
     use crate::{Answer, MdQuestion, MdQuestions};
+    use nom::error::ErrorKind::TakeUntil;
+    use nom::Err::Error;
 
     #[test]
     fn test_questions_parser() {
@@ -253,6 +255,15 @@ A developer needs to create a banner component. This component shows an image ac
         assert_eq!(
             question_header("## Question 1 `Templates and Components`"),
             Ok(("", (1, "Templates and Components".into())))
+        );
+    }
+
+    #[test]
+    fn test_question_header_parser_with_ignored_question() {
+        let _ = pretty_env_logger::try_init();
+        assert_eq!(
+            question_header("## Question 1 `Ignore`"),
+            Err(Error(("", TakeUntil)))
         );
     }
 
