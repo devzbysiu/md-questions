@@ -39,7 +39,7 @@ The idea is simple: you write questions in markdown file using some convention, 
 parse this markdown. Here are example questions with description of question structure:
 
 ```markdown
-## Question 1 `Programming Language`             // 1. Question Header: ## Question <number> `<category>`
+## Question 1 `Programming Language` `Ignore`    // 1. Question Header: ## Question <number> `<category>` `<marker>`
 What language was used to write this library?    // 2. Question Content. Can be multi-line.
 Pick one.                                        //
                                                  // 3. New line.
@@ -67,7 +67,8 @@ What letter S in SOLID acronym stands for?
 
 ```
 
-Reading section is optional. All the rest is required to correctly parse the markdown.
+Reading section is optional. Marker field is optional.
+All the rest is required to correctly parse the markdown.
 
 Then you can read the questions as following:
 ```rust
@@ -77,9 +78,12 @@ let questions = Questions::from(content.as_str());
 println!("First question: {}", &questions[0].text());
 ```
 
-You can use special category `Ignore` which allows to skip the question.
+You can use marker to mark a question. Currently, only `Ignore` marker is supported.
+It allows to skip the parsing of the question.
+This way we can keep more advanced questions in the markdown but still use the library.
+
 ```markdown
-## Question 1 `Ignore`
+## Question 1 `Some category` `Ignore`
 This multi-line aswers question is not yet supported.
 
 ## Answers
@@ -97,8 +101,6 @@ This multi-line aswers question is not yet supported.
 ---
 
 ```
-This way you can still
-parse the markdown but include questions which this library is not able to parse (yet).
 
 # <p id="installation">Installation</p>
 
