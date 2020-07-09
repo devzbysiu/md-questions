@@ -35,24 +35,24 @@
 
 # <p id="about">About</p>
 
-The idea is simple: you write questions in markdown file using some convention, then you can use this library to
-parse this markdown. Here are example questions with description of question structure:
+The idea is simple: you write questions in markdown file using specified convention, then you can use this library to
+parse the markdown. Here are example questions with the description of the question structure:
 
 ```markdown
-## Question 1 `Programming Language` `Ignore`    // 1. Question Header: ## Question <number> `<category>` `<marker>`
-What language was used to write this library?    // 2. Question Content. Can be multi-line.
-Pick one.                                        //
-                                                 // 3. New line.
-## Answers                                       // 4. Answers Header: ## Answers
-- [x] Rust                                       // 5. Answers.
-- [ ] Java                                       //    Only single-line answers.
-- [ ] Kotlin                                     //    Correct answer: - [x] <text>
-- [ ] Go                                         //    Incorrect answer: - [ ] <text>
-                                                 // 6. New line.
-## [Reading](reading/question-1.md)              // 7. Optional Reading Header: ## [Reading](<url>)
-                                                 // 8. New line.
----                                              // 9. Questions Separator.
-                                                 // 10. New line.
+## Question 1 `Programming Language` `Ignore`  // 1. Question Header: ## Question <number> `<category>` `<marker>`
+What language was used to write this library?  // 2. Question Content. Can be multi-line.
+Pick one.                                      //
+                                               // 3. New line.
+## Answers                                     // 4. Answers Header: ## Answers
+- [x] Rust                                     // 5. Answers.
+- [ ] Java                                     //    Only single-line answers.
+- [ ] Kotlin                                   //    Correct answer: - [x] <text>
+- [ ] Go                                       //    Incorrect answer: - [ ] <text>
+                                               // 6. New line.
+## [Reading](reading/question-1.md)            // 7. Optional Reading Header: ## [Reading](<url>)
+                                               // 8. New line.
+---                                            // 9. Questions Separator.
+                                               // 10. New line.
 ## Question 2 `Clean Code`
 What letter S in SOLID acronym stands for?
 
@@ -78,7 +78,8 @@ let questions = Questions::from(content.as_str());
 println!("First question: {}", &questions[0].text());
 ```
 
-You can use marker to mark a question. Currently, only `Ignore` marker is supported.
+You can use marker to mark a question. Currently, only `Ignore` marker is supported (casing is not
+important).
 It allows to skip the parsing of the question.
 This way we can keep more advanced questions in the markdown but still use the library.
 
