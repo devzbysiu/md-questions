@@ -48,8 +48,9 @@ fn question_header(i: &str) -> IResult<&str, (u32, String)> {
     let (input, num, category) = loop {
         debug!("loop with input: {}", i);
         let (input, (num, category)) = number_and_category(i)?;
-        debug!("found category: {}", category);
-        if category.to_lowercase() != "ignore" {
+        let (input, marker) = opt_marker(input)?;
+        debug!("found marker: {}", marker);
+        if marker.to_lowercase() != "ignore" {
             break (input, num, category);
         }
         debug!("ignoring");
@@ -74,6 +75,14 @@ fn number_and_category(i: &str) -> IResult<&str, (u32, String)> {
         char('`'),
     ))(i)?;
     Ok((i, (num, category.into())))
+}
+
+fn opt_marker(i: &str) -> IResult<&str, String> {
+    let (i, marker) = opt(tuple((char(' '), char('`'), take_until("`"), char('`'))))(i)?;
+    match marker {
+        Some((_, _, marker, _)) => Ok((i, marker.into())),
+        None => Ok((i, "".into())),
+    }
 }
 
 fn to_int(i: &str) -> Result<u32, ParseIntError> {
@@ -262,7 +271,7 @@ A developer needs to create a banner component. This component shows an image ac
     fn test_question_header_parser_with_ignored_question() {
         let _ = pretty_env_logger::try_init();
         assert_eq!(
-            question_header("## Question 1 `Ignore`"),
+            question_header("## Question 1 `OSGi Services` `Ignore`"),
             Err(Error(("", TakeUntil)))
         );
     }
