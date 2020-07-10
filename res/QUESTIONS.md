@@ -9,7 +9,7 @@ A developer needs to create a banner component. This component shows an image ac
 
 ---
 
-## Question 2 `OSGi Services` `Ignore`
+## Question 2 `OSGi Services`
 A developer is working on a complex project with multiple bundles. One bundle provides an OSGi service for other bundles. Which two options are necessary to ensure that the other bundles can reference that OSGi service? (Choose two.)
 
 ## Answers
