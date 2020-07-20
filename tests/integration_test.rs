@@ -18,7 +18,7 @@ fn test_reading_questions() {
             .with_category("Templates and Components")
     );
 
-    let multiline_question = &questions[16];
+    let multiline_question = &questions[17];
     assert_eq!(multiline_question,
           &MdQuestion::default()
               .with_number(18)
@@ -46,5 +46,5 @@ fn test_reading_questions() {
               .with_category("OSGi Services")
       );
 
-    assert_eq!(questions.count(), 57);
+    assert_eq!(questions.count(), 58);
 }

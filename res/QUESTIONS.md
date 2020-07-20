@@ -666,7 +666,7 @@ A developer creates two custom classes. ClassA has the following code:
       }
     }
   ```
-The developer creates a custom log custom.log with debug level in OSGi sling log support for the Java package com.aem.abc. The developer adds another class ClassB with the following code:
+  The developer creates a custom log custom.log with debug level in OSGi sling log support for the Java package com.aem.abc. The developer adds another class ClassB with the following code:
   ```java
     package com.aem.xyz;
     import org.slf4j.Logger;
@@ -681,10 +681,10 @@ The developer creates a custom log custom.log with debug level in OSGi sling log
   Which action must the developer take to see the log message in the same file from both classes?
 
 ## Answers
-- [ ] Create separate a log file in the OSGi web console ->Sling -> Log Support for logger com.aem.xyz.
-- [ ] Configure custom.log in the OSGi web console -> Sling -> Log Support and replace com.aem.xyz with com.aem.abc.
-- [x] Configure custom.log in the OSGi web console -> Sling -> Log Support and replace logger com.aem.abc with com.aem.
-- [ ] Configure custom.log in the OSGi web console -> Sling -> Log Support and replace the package com.aem.abc with com.aem.xyz.
+- [ ] Create separate a log file in the OSGi web console -->Sling --> Log Support for logger com.aem.xyz.
+- [ ] Configure custom.log in the OSGi web console --> Sling --> Log Support and replace com.aem.xyz with com.aem.abc.
+- [x] Configure custom.log in the OSGi web console --> Sling --> Log Support and replace logger com.aem.abc with com.aem.
+- [ ] Configure custom.log in the OSGi web console --> Sling --> Log Support and replace the package com.aem.abc with com.aem.xyz.
 
 ## [Reading](https://docs.adobe.com/content/help/en/experience-manager-65/deploying/configuring/monitoring-and-maintaining.html#working-with-audit-records-and-log-files)
 
@@ -726,7 +726,7 @@ A customer bundle of an application is in state “Installed” after deploying 
 ---
 
 ## Question 54 `Installation and Configuration of AEM`
-How should a developer configure the replication agent to flush the dispatcher cache for a newly activated page?([[]]):
+How should a developer configure the replication agent to flush the dispatcher cache for a newly activated page?
 
 ## Answers
 - [ ] Set the serialization type property of the default agent to dispatcher flush.
@@ -739,7 +739,7 @@ How should a developer configure the replication agent to flush the dispatcher c
 ---
 
 ## Question 55 `Troubleshooting AEM projects`
-Which log file should a developer use to search for exception stack traces?
+Which log file should a developer use to search for exception stack traces?:
 
 ## Answers
 - [ ] <aem-install>/crx-quickstart/logs/request.log
