@@ -272,7 +272,7 @@ A developer needs to create a banner component. This component shows an image ac
         let _ = pretty_env_logger::try_init();
         assert_eq!(
             question_header("## Question 1 `OSGi Services` `Ignore`"),
-            Err(Error(("", TakeUntil)))
+            Err(Error(nom::error::Error::new("", TakeUntil)))
         );
     }
 
