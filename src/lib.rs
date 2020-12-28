@@ -19,7 +19,7 @@ mod parser;
 /// # Ok(())
 /// # }
 /// ```
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Default)]
 pub struct MdQuestions {
     questions: Vec<MdQuestion>,
 }
@@ -42,12 +42,6 @@ impl MdQuestions {
     #[must_use]
     pub fn questions(&self) -> &[MdQuestion] {
         &self.questions
-    }
-}
-
-impl Default for MdQuestions {
-    fn default() -> Self {
-        Self { questions: vec![] }
     }
 }
 
@@ -88,7 +82,7 @@ impl Index<usize> for MdQuestions {
 /// # Ok(())
 /// # }
 /// ```
-#[derive(Debug, Eq, PartialEq, Clone)]
+#[derive(Default, Debug, Eq, PartialEq, Clone)]
 pub struct MdQuestion {
     /// Number of the question in order.
     number: u32,
@@ -164,8 +158,8 @@ impl MdQuestion {
     }
 
     #[must_use]
-    pub fn answer(&self, idx: usize) -> &Answer {
-        self.answers.get(idx).unwrap() // TODO: get rid of unwrap
+    pub fn answer(&self, idx: usize) -> Option<&Answer> {
+        self.answers.get(idx)
     }
 
     #[must_use]
@@ -176,18 +170,6 @@ impl MdQuestion {
             .filter(|&answer| answer.is_correct())
             .count();
         correct_answers > 1
-    }
-}
-
-impl Default for MdQuestion {
-    fn default() -> Self {
-        Self {
-            number: 0,
-            text: String::new(),
-            answers: vec![],
-            reading: None,
-            category: String::new(),
-        }
     }
 }
 
@@ -203,7 +185,7 @@ impl Default for MdQuestion {
 /// # Ok(())
 /// # }
 /// ```
-#[derive(Debug, Eq, PartialEq, Clone)]
+#[derive(Default, Debug, Eq, PartialEq, Clone)]
 pub struct Answer {
     /// Answer text.
     text: String,
@@ -227,14 +209,5 @@ impl Answer {
     #[must_use]
     pub fn is_correct(&self) -> bool {
         self.is_correct
-    }
-}
-
-impl Default for Answer {
-    fn default() -> Self {
-        Self {
-            text: String::new(),
-            is_correct: false,
-        }
     }
 }
