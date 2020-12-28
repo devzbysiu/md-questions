@@ -1,14 +1,14 @@
-use md_questions::{Answer, MdQuestion, MdQuestions};
+use md_questions::{Answer, Question, MdQuestions};
 use std::fs::read_to_string;
 
 #[test]
-fn test_reading_questions() {
-    let content = read_to_string("res/QUESTIONS.md").unwrap();
+fn test_reading_checkbox_questions_from_file() {
+    let content = read_to_string("res/checkbox-questions.md").unwrap();
     let questions = MdQuestions::from(content.as_str());
     let first_question = &questions[0];
 
     assert_eq!(first_question,
-        &MdQuestion::default()
+        &Question::default()
             .with_number(1)
             .with_text("A developer needs to create a banner component. This component shows an image across the full \
               width of the page. A title is shown on top of the image. This text can be aligned to the left, middle, \
@@ -23,7 +23,7 @@ fn test_reading_questions() {
 
     let multiline_question = &questions[17];
     assert_eq!(multiline_question,
-          &MdQuestion::default()
+          &Question::default()
               .with_number(18)
               .with_text(r#"A developer is creating a new OSGi bundle `com.custom.package.b` to expose new services. `com.custom.package.a` is already installed and active in the system and has the following package definition:
   ```
@@ -42,12 +42,18 @@ fn test_reading_questions() {
   Import-Package: com.custom.package.a;version="[1,2)",com.sample.package.b;version="[3.0,3.0]",com.sample.package.c;version="[2,3)"
   ```
   What will happen when the developer uploads the bundle com.custom.package.b into the system?"#)
-              .with_answer(Answer::new("The bundle will install but fail the activation due to unsatisfied dependencies `com.sample.package.b` and `com.sample.package.c`.", true))
-              .with_answer(Answer::new("The bundle will install but fail the activation due to unsatisfied dependency `com.sample.package.c`.", false))
+              .with_answer(Answer::new("The bundle will install but fail the activation due to unsatisfied dependencies \
+                  `com.sample.package.b` and `com.sample.package.c`.", true))
+              .with_answer(Answer::new("The bundle will install but fail the activation due to unsatisfied dependency \
+                  `com.sample.package.c`.", false))
               .with_answer(Answer::new("The bundle will install and activate successfully.", false))
-              .with_answer(Answer::new("The bundle will install but fail the activation due to unsatisfied dependency `com.sample.package.b`.", false))
+              .with_answer(Answer::new("The bundle will install but fail the activation due to unsatisfied dependency \
+                  `com.sample.package.b`.", false))
               .with_category("OSGi Services")
       );
 
     assert_eq!(questions.count(), 58);
 }
+
+#[test]
+fn test_parsing_open_questions() {}

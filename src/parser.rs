@@ -1,10 +1,10 @@
-use crate::{Answer, MdQuestion, MdQuestions};
+use crate::{Answer, MdQuestions, Question};
 use log::debug;
 use nom::branch::alt;
 use nom::bytes::complete::{tag, take_until};
 use nom::character::complete::{char, digit1};
 use nom::combinator::{map_res, opt};
-use nom::multi::{many1, many_m_n};
+use nom::multi::many1;
 use nom::sequence::tuple;
 use nom::IResult;
 use std::num::ParseIntError;
@@ -14,7 +14,7 @@ pub(crate) fn questions(i: &str) -> IResult<&str, MdQuestions> {
     Ok((i, MdQuestions::new(questions)))
 }
 
-fn question(i: &str) -> IResult<&str, MdQuestion> {
+fn question(i: &str) -> IResult<&str, Question> {
     let _ = pretty_env_logger::try_init();
     let (i, (number, category)) = question_header(i)?;
     let (i, _) = new_line(i)?;
@@ -32,7 +32,7 @@ fn question(i: &str) -> IResult<&str, MdQuestion> {
     let (i, _) = horizontal_rule(i)?;
     let (i, _) = new_line(i)?;
     let (i, _) = new_line(i)?;
-    let question = MdQuestion {
+    let question = Question {
         number,
         text,
         answers,
@@ -112,17 +112,20 @@ fn answers_header(i: &str) -> IResult<&str, &str> {
 }
 
 fn answers(i: &str) -> IResult<&str, Vec<Answer>> {
-    many_m_n(4, 5, answer)(i)
+    many1(answer)(i)
 }
 
 fn answer(i: &str) -> IResult<&str, Answer> {
-    let (i, (checkbox, _, text, _)) = tuple((answer_checkbox, char(' '), line, char('\n')))(i)?;
-    let is_correct = checkbox == "- [x]";
+    let (i, (checkbox, text, _)) = tuple((alt((answer_checkbox, tag("- "))), line, char('\n')))(i)?;
+    let is_correct = match checkbox {
+        "- [x] " | "- " => true,
+        _ => false,
+    };
     Ok((i, Answer::new(text, is_correct)))
 }
 
 fn answer_checkbox(i: &str) -> IResult<&str, &str> {
-    alt((tag("- [ ]"), tag("- [x]")))(i)
+    alt((tag("- [ ] "), tag("- [x] ")))(i)
 }
 
 fn opt_reading_header(i: &str) -> IResult<&str, Option<String>> {
@@ -144,7 +147,7 @@ mod test {
         opt_reading_header, question_header, questions,
     };
     use crate::parser::question;
-    use crate::{Answer, MdQuestion, MdQuestions};
+    use crate::{Answer, MdQuestions, Question};
     use nom::error::ErrorKind::TakeUntil;
     use nom::Err::Error;
 
@@ -193,27 +196,39 @@ The structure section of an editable template has a locked component. What happe
             Ok((
                 "",
                 MdQuestions::new(vec![
-                    MdQuestion::default()
+                    Question::default()
                         .with_number(1)
-                        .with_text("A developer needs to create a banner component. This component shows an image across the full width of the page. A title is shown on top of the image. This text can be aligned to the left, middle, or right. The core components feature a teaser component which matches almost all requirements, but not all. What is the most maintainable way for the developer to implement these requirements?")
+                        .with_text("A developer needs to create a banner component. This component shows an image \
+                          across the full width of the page. A title is shown on top of the image. This text can be \
+                          aligned to the left, middle, or right. The core components feature a teaser component which \
+                          matches almost all requirements, but not all. What is the most maintainable way for the \
+                          developer to implement these requirements?")
                         .with_answer(Answer::new("Use and configure the teaser core component.", false))
                         .with_answer(Answer::new("Create a new custom component from scratch.", false))
                         .with_answer(Answer::new("Overlay the teaser core component.", false))
                         .with_answer(Answer::new("Inherit from the teaser core component.", true))
                         .with_category("Templates and Components"),
-                    MdQuestion::default()
+                    Question::default()
                         .with_number(2)
-                        .with_text("A developer is working on a complex project with multiple bundles. One bundle provides an OSGi service for other bundles. Which two options are necessary to ensure that the other bundles can reference that OSGi service? (Choose two.)")
-                        .with_answer(Answer::new( "The bundles consuming the service need to import the fully qualified name of the service interface.", true))
+                        .with_text("A developer is working on a complex project with multiple bundles. One bundle \
+                          provides an OSGi service for other bundles. Which two options are necessary to ensure that \
+                          the other bundles can reference that OSGi service? (Choose two.)")
+                        .with_answer(Answer::new( "The bundles consuming the service need to import the fully \
+                            qualified name of the service interface.", true))
                         .with_answer(Answer::new("The service needs to correctly declare metatype information.", false))
-                        .with_answer(Answer::new("The bundle providing the service needs to contain a whitelist of allowed consumer bundles.", false))
-                        .with_answer(Answer::new("The bundle providing the service needs to contain an adequate SCR descriptor file.", false))
-                        .with_answer(Answer::new("The bundle providing the service needs to export the java package of the service interface.", true))
+                        .with_answer(Answer::new("The bundle providing the service needs to contain a whitelist of \
+                            allowed consumer bundles.", false))
+                        .with_answer(Answer::new("The bundle providing the service needs to contain an adequate SCR \
+                            descriptor file.", false))
+                        .with_answer(Answer::new("The bundle providing the service needs to export the java package of \
+                            the service interface.", true))
                         .with_category("OSGi Services"),
-                    MdQuestion::default()
+                    Question::default()
                         .with_number(3)
-                        .with_text("The structure section of an editable template has a locked component. What happens to the content of that component when a developer unlocks it?")
-                        .with_answer(Answer::new("The content stays in the same place but it ignored on pages using the template.", false))
+                        .with_text("The structure section of an editable template has a locked component. What happens \
+                          to the content of that component when a developer unlocks it?")
+                        .with_answer(Answer::new("The content stays in the same place but it ignored on pages using \
+                            the template.", false))
                         .with_answer(Answer::new("The content is moved to the initial section of the editable template.", true))
                         .with_answer(Answer::new("The content is deleted after confirmation from the template author.", false))
                         .with_answer(Answer::new("The content is copied to the initial section of the editable template.", false))
@@ -225,7 +240,7 @@ The structure section of an editable template has a locked component. What happe
     }
 
     #[test]
-    fn test_question_parser() {
+    fn test_question_parser_with_checkbox_question() {
         let _ = pretty_env_logger::try_init();
         let input = r#"## Question 1 `Templates and Components`
 A developer needs to create a banner component. This component shows an image across the full width of the page. A title is shown on top of the image. This text can be aligned to the left, middle, or right. The core components feature a teaser component which matches almost all requirements, but not all. What is the most maintainable way for the developer to implement these requirements?
@@ -245,7 +260,7 @@ A developer needs to create a banner component. This component shows an image ac
             question(input),
             Ok((
                 "",
-                MdQuestion::default()
+                Question::default()
                     .with_number(1)
                     .with_text("A developer needs to create a banner component. This component shows an image across the full width of the page. A title is shown on top of the image. This text can be aligned to the left, middle, or right. The core components feature a teaser component which matches almost all requirements, but not all. What is the most maintainable way for the developer to implement these requirements?")
                     .with_answer(Answer::new("Use and configure the teaser core component.", false))
@@ -258,6 +273,33 @@ A developer needs to create a banner component. This component shows an image ac
         );
     }
 
+    #[test]
+    fn test_question_parser_with_open_question() {
+        let _ = pretty_env_logger::try_init();
+        let input = r#"## Question 1 `Trees`
+Describe rooted tree.
+
+## Answers
+- Rooted tree is a tree which all edges are going in to the root node or all of them go out of the tree node.
+
+## [Reading](reading/question-3-reading.md)
+
+---
+
+"#;
+        assert_eq!(
+            question(input),
+            Ok((
+                "",
+                Question::default()
+                    .with_number(1)
+                    .with_text("Describe rooted tree.")
+                    .with_answer(Answer::new("Rooted tree is a tree which all edges are going in to the root node or all of them go out of the tree node.", true))
+                    .with_category("Trees")
+                    .with_reading("reading/question-3-reading.md")
+            ))
+        );
+    }
     #[test]
     fn test_question_header_parser() {
         let _ = pretty_env_logger::try_init();
@@ -302,6 +344,10 @@ A developer needs to create a banner component. This component shows an image ac
             answer("- [x] Some answer\n"),
             Ok(("", Answer::new("Some answer", true)))
         );
+        assert_eq!(
+            answer("- Some answer\n"),
+            Ok(("", Answer::new("Some answer", true)))
+        );
     }
 
     #[test]
@@ -313,12 +359,12 @@ A developer needs to create a banner component. This component shows an image ac
     #[test]
     fn test_answer_checkbox() {
         let _ = pretty_env_logger::try_init();
-        assert_eq!(answer_checkbox("- [ ]"), Ok(("", "- [ ]")));
-        assert_eq!(answer_checkbox("- [x]"), Ok(("", "- [x]")));
+        assert_eq!(answer_checkbox("- [ ] "), Ok(("", "- [ ] ")));
+        assert_eq!(answer_checkbox("- [x] "), Ok(("", "- [x] ")));
     }
 
     #[test]
-    fn test_answers_parser() {
+    fn test_answers_parser_with_many_answers() {
         let _ = pretty_env_logger::try_init();
         let input = r#"- [ ] Use and configure the teaser core component.
 - [ ] Create a new custom component from scratch.
@@ -335,6 +381,23 @@ A developer needs to create a banner component. This component shows an image ac
                     Answer::new("Overlay the teaser core component.", false),
                     Answer::new("Inherit from the teaser core component.", true)
                 ]
+            ))
+        );
+    }
+
+    #[test]
+    fn test_answers_parser_with_one_answer() {
+        let _ = pretty_env_logger::try_init();
+        let input = r#"- [x] Use and configure the teaser core component.
+"#;
+        assert_eq!(
+            answers(input),
+            Ok((
+                "",
+                vec![Answer::new(
+                    "Use and configure the teaser core component.",
+                    true
+                )]
             ))
         );
     }
