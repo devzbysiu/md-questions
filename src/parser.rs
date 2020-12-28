@@ -117,10 +117,7 @@ fn answers(i: &str) -> IResult<&str, Vec<Answer>> {
 
 fn answer(i: &str) -> IResult<&str, Answer> {
     let (i, (checkbox, text, _)) = tuple((alt((answer_checkbox, tag("- "))), line, char('\n')))(i)?;
-    let is_correct = match checkbox {
-        "- [x] " | "- " => true,
-        _ => false,
-    };
+    let is_correct = matches!(checkbox, "- [x] " | "- ");
     Ok((i, Answer::new(text, is_correct)))
 }
 
