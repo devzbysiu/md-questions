@@ -116,7 +116,7 @@ fn number_and_category(i: &str) -> IResult<&str, (u32, String)> {
 }
 
 fn marker(i: &str) -> IResult<&str, String> {
-    let (i, (_, _, marker, _)) = tuple((char(' '), char('`'), take_until("`"), char('`')))(i)?;
+    let (i, (_, marker, _)) = tuple((tag(" `"), take_until("`"), char('`')))(i)?;
     Ok((i, marker.into()))
 }
 
