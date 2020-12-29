@@ -1,4 +1,4 @@
-use crate::{Answer, MdQuestions, Question};
+use crate::{Answer, MdQuestions, Question, QuestionMetadata, QuestionType};
 use log::debug;
 use nom::branch::alt;
 use nom::bytes::complete::{tag, take_until};
@@ -20,6 +20,39 @@ pub(crate) fn questions(i: &str) -> IResult<&str, MdQuestions> {
 
 fn question(i: &str) -> IResult<&str, Question> {
     let _ = pretty_env_logger::try_init();
+    let (i, metadata) = opt(question_metadata)(i)?;
+    if let Some(question_metadata) = metadata {
+        match question_metadata.question_type() {
+            QuestionType::Checkbox => {
+                debug!("found question type: checkbox");
+                let (i, _) = new_line(i)?;
+                let (i, _) = new_line(i)?;
+                let (i, question) = checkbox_question(i)?;
+                return Ok((i, question));
+            }
+        }
+    }
+    let (i, question) = checkbox_question(i)?;
+    Ok((i, question))
+}
+
+fn question_metadata(i: &str) -> IResult<&str, QuestionMetadata> {
+    let (i, (_, key, _, value, _)) = tuple((
+        tag("[//]: # ("),
+        take_until(":"),
+        tag(": "),
+        take_until(")"),
+        tag(")"),
+    ))(i)?;
+    let mut metadata = QuestionMetadata::default();
+    match key {
+        "type" => metadata = metadata.with_question_type(QuestionType::from(value)),
+        _ => panic!("not supported key in question metadata: {}", key),
+    }
+    Ok((i, metadata))
+}
+
+fn checkbox_question(i: &str) -> IResult<&str, Question> {
     let (i, (number, category)) = question_header(i)?;
     let (i, _) = new_line(i)?;
     let (i, text) = paragraph(i)?;
@@ -144,12 +177,8 @@ fn horizontal_rule(i: &str) -> IResult<&str, &str> {
 
 #[cfg(test)]
 mod test {
-    use super::{
-        answer, answer_checkbox, answers, answers_header, horizontal_rule, line, new_line,
-        opt_reading_header, question_header, questions,
-    };
+    use super::*;
     use crate::parser::question;
-    use crate::{Answer, MdQuestions, Question};
     use nom::error::ErrorKind::TakeUntil;
     use nom::Err::Error;
 
@@ -276,6 +305,42 @@ A developer needs to create a banner component. This component shows an image ac
     }
 
     #[test]
+    fn test_question_parser_with_question_metadata() {
+        let _ = pretty_env_logger::try_init();
+        let input = r#"[//]: # (type: checkbox)
+
+## Question 1 `Templates and Components`
+A developer needs to create a banner component. This component shows an image across the full width of the page. A title is shown on top of the image. This text can be aligned to the left, middle, or right. The core components feature a teaser component which matches almost all requirements, but not all. What is the most maintainable way for the developer to implement these requirements?
+
+## Answers
+- [ ] Use and configure the teaser core component.
+- [ ] Create a new custom component from scratch.
+- [ ] Overlay the teaser core component.
+- [X] Inherit from the teaser core component.
+
+## [Reading](reading/question-3-reading.md)
+
+---
+
+"#;
+        assert_eq!(
+            question(input),
+            Ok((
+                "",
+                Question::default()
+                    .with_number(1)
+                    .with_text("A developer needs to create a banner component. This component shows an image across the full width of the page. A title is shown on top of the image. This text can be aligned to the left, middle, or right. The core components feature a teaser component which matches almost all requirements, but not all. What is the most maintainable way for the developer to implement these requirements?")
+                    .with_answer(Answer::new("Use and configure the teaser core component.", false))
+                    .with_answer(Answer::new("Create a new custom component from scratch.", false))
+                    .with_answer(Answer::new("Overlay the teaser core component.", false))
+                    .with_answer(Answer::new("Inherit from the teaser core component.", true))
+                    .with_category("Templates and Components")
+                    .with_reading("reading/question-3-reading.md")
+            ))
+        );
+    }
+
+    #[test]
     fn test_question_parser_with_open_question() {
         let _ = pretty_env_logger::try_init();
         let input = r#"## Question 1 `Trees`
@@ -302,6 +367,45 @@ Describe rooted tree.
             ))
         );
     }
+
+    #[test]
+    fn test_question_metadata_parser() {
+        let _ = pretty_env_logger::try_init();
+        assert_eq!(
+            question_metadata(r#"[//]: # (type: checkbox)"#),
+            Ok((
+                "",
+                QuestionMetadata::default().with_question_type(QuestionType::Checkbox)
+            ))
+        );
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_question_metadata_parser_with_incorrect_type() {
+        let _ = pretty_env_logger::try_init();
+        assert_eq!(
+            question_metadata(r#"[//]: # (type: incorrect)"#),
+            Ok((
+                "",
+                QuestionMetadata::default().with_question_type(QuestionType::Checkbox)
+            ))
+        );
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_question_metadata_parser_with_incorrect_key() {
+        let _ = pretty_env_logger::try_init();
+        assert_eq!(
+            question_metadata(r#"[//]: # (incorrect-key: checkbox)"#),
+            Ok((
+                "",
+                QuestionMetadata::default().with_question_type(QuestionType::Checkbox)
+            ))
+        );
+    }
+
     #[test]
     fn test_question_header_parser() {
         let _ = pretty_env_logger::try_init();

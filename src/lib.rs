@@ -62,6 +62,44 @@ impl Index<usize> for MdQuestions {
     }
 }
 
+#[derive(Debug, Default, PartialEq, Eq)]
+pub struct QuestionMetadata {
+    question_type: QuestionType,
+}
+
+impl QuestionMetadata {
+    #[must_use]
+    pub fn with_question_type(mut self, question_type: QuestionType) -> Self {
+        self.question_type = question_type;
+        self
+    }
+
+    #[must_use]
+    pub fn question_type(&self) -> &QuestionType {
+        &self.question_type
+    }
+}
+
+#[derive(Debug, PartialEq, Eq)]
+pub enum QuestionType {
+    Checkbox,
+}
+
+impl From<&str> for QuestionType {
+    fn from(value: &str) -> Self {
+        match value {
+            "checkbox" => Self::Checkbox,
+            _ => panic!("not supported question type: {}", value),
+        }
+    }
+}
+
+impl Default for QuestionType {
+    fn default() -> Self {
+        Self::Checkbox
+    }
+}
+
 /// Single question.
 ///
 /// Example of usage:
