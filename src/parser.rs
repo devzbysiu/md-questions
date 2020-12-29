@@ -1,5 +1,5 @@
 use crate::{Answer, MdQuestions, Question, QuestionMetadata, QuestionType};
-use log::debug;
+use log::{debug, warn};
 use nom::branch::alt;
 use nom::bytes::complete::{tag, take_until};
 use nom::character::complete::{char, digit1};
@@ -63,7 +63,7 @@ fn checkbox_question(i: &str) -> IResult<&str, Question> {
     let (i, answers) = answers(i)?;
     let (i, _) = new_line(i)?;
     // let (i, _) = new_line(i)?; // TODO: this should be here to be consistent
-    let (i, reading) = opt_reading_header(i)?;
+    let (i, reading) = opt(reading_header)(i)?;
     let (i, _) = opt_new_line(i)?;
     let (i, _) = opt_new_line(i)?;
     let (i, _) = horizontal_rule(i)?;
@@ -85,10 +85,12 @@ fn question_header(i: &str) -> IResult<&str, (u32, String)> {
     let (input, num, category) = loop {
         debug!("loop with input: {}", i);
         let (input, (num, category)) = number_and_category(i)?;
-        let (input, marker) = opt_marker(input)?;
-        debug!("found marker: {}", marker);
-        if marker.to_lowercase() != "ignore" {
-            break (input, num, category);
+        let (input, marker) = opt(marker)(input)?;
+        debug!("found marker: {:#?}", marker);
+        match marker {
+            Some(marker) if marker.to_lowercase() != "ignore" => break (input, num, category),
+            None => break (input, num, category),
+            Some(marker) => warn!("not supported marker: {}", marker),
         }
         debug!("ignoring");
         let (input, _) = take_until("---")(input)?;
@@ -103,23 +105,19 @@ fn question_header(i: &str) -> IResult<&str, (u32, String)> {
 }
 
 fn number_and_category(i: &str) -> IResult<&str, (u32, String)> {
-    let (i, (_, num, _, _, category, _)) = tuple((
+    let (i, (_, num, _, category, _)) = tuple((
         tag("## Question "),
         map_res(digit1, to_int),
-        char(' '),
-        char('`'),
+        tag(" `"),
         take_until("`"),
         char('`'),
     ))(i)?;
     Ok((i, (num, category.into())))
 }
 
-fn opt_marker(i: &str) -> IResult<&str, String> {
-    let (i, marker) = opt(tuple((char(' '), char('`'), take_until("`"), char('`'))))(i)?;
-    match marker {
-        Some((_, _, marker, _)) => Ok((i, marker.into())),
-        None => Ok((i, "".into())),
-    }
+fn marker(i: &str) -> IResult<&str, String> {
+    let (i, (_, _, marker, _)) = tuple((char(' '), char('`'), take_until("`"), char('`')))(i)?;
+    Ok((i, marker.into()))
 }
 
 fn to_int(i: &str) -> Result<u32, ParseIntError> {
@@ -163,12 +161,9 @@ fn answer_checkbox(i: &str) -> IResult<&str, &str> {
     alt((tag(UNCHECKED), tag(CHECKED)))(i)
 }
 
-fn opt_reading_header(i: &str) -> IResult<&str, Option<String>> {
-    let (i, reading) = opt(tuple((tag("## [Reading]("), take_until(")"), tag(")"))))(i)?;
-    match reading {
-        Some((_, txt, _)) => Ok((i, Some(txt.into()))),
-        None => Ok((i, None)),
-    }
+fn reading_header(i: &str) -> IResult<&str, String> {
+    let (i, (_, txt, _)) = tuple((tag("## [Reading]("), take_until(")"), tag(")")))(i)?;
+    Ok((i, txt.into()))
 }
 
 fn horizontal_rule(i: &str) -> IResult<&str, &str> {
@@ -395,7 +390,7 @@ Describe rooted tree.
     }
 
     #[test]
-    fn test_question_header_parser() {
+    fn test_question_header_parser_with_correct_input() {
         let _ = pretty_env_logger::try_init();
         assert_eq!(
             question_header("## Question 1 `Templates and Components`"),
@@ -440,7 +435,7 @@ Describe rooted tree.
         let _ = pretty_env_logger::try_init();
         assert_eq!(
             number_and_category("## Question 4294967295 `Category`"),
-            Ok(("", (4294967295, "Category".into())))
+            Ok(("", (4_294_967_295, "Category".into())))
         );
     }
 
@@ -449,6 +444,33 @@ Describe rooted tree.
     fn test_number_and_category_parser_with_too_big_number() {
         let _ = pretty_env_logger::try_init();
         number_and_category("## Question 4294967296``").unwrap(); // should panic
+    }
+
+    #[test]
+    fn test_marker_parser_with_correct_input() {
+        let _ = pretty_env_logger::try_init();
+        assert_eq!(marker(" `Ignored`"), Ok(("", "Ignored".into())));
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_marker_parser_with_not_opened_marker() {
+        let _ = pretty_env_logger::try_init();
+        marker(" Ignored`").unwrap(); // should panic
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_marker_parser_without_space_in_front() {
+        let _ = pretty_env_logger::try_init();
+        marker("`Ignored`").unwrap(); // should panic
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_marker_parser_with_not_closed_marker() {
+        let _ = pretty_env_logger::try_init();
+        marker(" `Ignored").unwrap(); // should panic
     }
 
     #[test]
@@ -545,13 +567,60 @@ Describe rooted tree.
     }
 
     #[test]
-    fn test_reading_header_parser() {
+    fn test_reading_header_parser_with_correct_input() {
         let _ = pretty_env_logger::try_init();
         assert_eq!(
-            opt_reading_header("## [Reading](reading/question-3-reading.md)\n"),
-            Ok(("\n", Some("reading/question-3-reading.md".into())))
+            reading_header("## [Reading](reading/question-3-reading.md)\n"),
+            Ok(("\n", "reading/question-3-reading.md".into()))
         );
-        assert_eq!(opt_reading_header(""), Ok(("", None)))
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_reading_header_parser_with_url_not_closed() {
+        let _ = pretty_env_logger::try_init();
+        reading_header("## [Reading](reading/question-3-reading.md\n").unwrap();
+        // should panic
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_reading_header_parser_with_url_not_opened() {
+        let _ = pretty_env_logger::try_init();
+        reading_header("## [Reading]reading/question-3-reading.md)\n").unwrap();
+        // should panic
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_reading_header_parser_with_label_not_opened() {
+        let _ = pretty_env_logger::try_init();
+        reading_header("## Reading](reading/question-3-reading.md)\n").unwrap();
+        // should panic
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_reading_header_parser_with_label_not_closed() {
+        let _ = pretty_env_logger::try_init();
+        reading_header("## [Reading(reading/question-3-reading.md)\n").unwrap();
+        // should panic
+    }
+
+    #[test]
+    fn test_reading_header_parser_with_broken_reading_header() {
+        let _ = pretty_env_logger::try_init();
+        let res = reading_header("## [Reading-broken](reading/question-3-reading.md)\n");
+        assert_eq!(true, res.is_err());
+
+        let res = reading_header("## [Reading-broken](reading/question-3-reading.md)\n");
+        assert_eq!(true, res.is_err());
+    }
+
+    #[test]
+    fn test_reading_header_parser_with_empty_url() {
+        let _ = pretty_env_logger::try_init();
+        assert_eq!(reading_header("## [Reading]()\n"), Ok(("\n", "".into())));
     }
 
     #[test]
