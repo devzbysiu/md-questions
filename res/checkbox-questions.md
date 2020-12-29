@@ -5,7 +5,7 @@ A developer needs to create a banner component. This component shows an image ac
 - [ ] Use and configure the teaser core component.
 - [ ] Create a new custom component from scratch.
 - [ ] Overlay the teaser core component.
-- [x] Inherit from the teaser core component.
+- [X] Inherit from the teaser core component.
 
 ---
 
@@ -13,11 +13,11 @@ A developer needs to create a banner component. This component shows an image ac
 A developer is working on a complex project with multiple bundles. One bundle provides an OSGi service for other bundles. Which two options are necessary to ensure that the other bundles can reference that OSGi service? (Choose two.)
 
 ## Answers
-- [x] The bundles consuming the service need to import the fully qualified name of the service interface.
+- [X] The bundles consuming the service need to import the fully qualified name of the service interface.
 - [ ] The service needs to correctly declare metatype information.
 - [ ] The bundle providing the service needs to contain a whitelist of allowed consumer bundles.
 - [ ] The bundle providing the service needs to contain an adequate SCR descriptor file.
-- [x] The bundle providing the service needs to export the java package of the service interface.
+- [X] The bundle providing the service needs to export the java package of the service interface.
 
 ---
 
@@ -26,7 +26,7 @@ The structure section of an editable template has a locked component. What happe
 
 ## Answers
 - [ ] The content stays in the same place but it ignored on pages using the template.
-- [x] The content is moved to the initial section of the editable template.
+- [X] The content is moved to the initial section of the editable template.
 - [ ] The content is deleted after confirmation from the template author.
 - [ ] The content is copied to the initial section of the editable template.
 
@@ -39,7 +39,7 @@ Which log file contains AEM application request and response entries?
 
 ## Answers
 - [ ] response.log
-- [x] request.log
+- [X] request.log
 - [ ] history.log
 - [ ] audit.log
 
@@ -52,7 +52,7 @@ A developer wants to extend AEM Core Components to create a custom Carousel Comp
 
 ## Answers
 - [ ] Make changes to the original component and assign a component group.
-- [x] Use the `sling:resourceSuperType` property to point to the core component.
+- [X] Use the `sling:resourceSuperType` property to point to the core component.
 - [ ] Use the `sling:resourceType` property to point to the core component.
 - [ ] Copy the Core Carousel component to `/apps/<project>` folder.
 
@@ -66,7 +66,7 @@ A developer wants to change the log level for a custom API. Which OSGi configura
 ## Answers
 - [ ] Apache Sling Logging Configuration
 - [ ] Apache Sling Log Tracker Service
-- [x] Apache Sling Logging Writer Configuration
+- [X] Apache Sling Logging Writer Configuration
 - [ ] Adobe Granite Log Analysis Service
 
 ## [Reading](reading/question-6.md)
@@ -80,7 +80,7 @@ A developer is installing a content package with the package manager. The develo
 - [ ] AEM instances automatically modify the number of transient nodes based on the load balancing.
 - [ ] Modify the export package manifest header and copy the content package to AEM installation folder.
 - [ ] Select the option MergePreserve for the Access Control Handling drop-down in the Install Package dialog-box.
-- [x] Change the value of Save Threshold in the Install Package dialog-box
+- [X] Change the value of Save Threshold in the Install Package dialog-box
 
 ---
 
@@ -90,7 +90,7 @@ A developer creates Editable Templates based on a custom Page component. The dev
 ## Answers
 - [ ] Define Style Definitions using Page Policy dialog on Editable Template.
 - [ ] Create two new client libraries with a dark and light theme and map them to the Page component.
-- [x] Set the sling:resourceSuperType property to core/wcm/components/page/v2/page on the Page component.
+- [X] Set the sling:resourceSuperType property to core/wcm/components/page/v2/page on the Page component.
 - [ ] Create a new dialog for the custom Page components.
 
 ---
@@ -102,7 +102,7 @@ A custom AEM application contains Bundle A and Bundle B. Bundle A has a dependen
 - [ ] Use the Felix Web Console to upload the bundles in the correct order.
 - [ ] Create one content package per bundle and use a package dependency to ensure installation order.
 - [ ] Embed both bundles in one content package and use property `installationOrder` in package properties for correct bundle installation order.
-- [x] Embed both bundles in one content package: the dependency via Import-Package is enough to ensure correct installation.
+- [X] Embed both bundles in one content package: the dependency via Import-Package is enough to ensure correct installation.
 
 ## [Reading](reading/question-9.md)
 
@@ -115,7 +115,7 @@ After adding new features, a developer’s environment is experiencing slowness 
 - [ ] Run the following command to generate thread dumps `jstack -l <pid> >> threaddumps.log`, analyze thread dumps to find long running sessions.
 - [ ] Go to Web Console > Status > Threads, verify the overall thread count.
 - [ ] Go to Tools > Operations > Monitoring. Create a new report based on Number of Active Sessions as metric.
-- [x] Go to `<aem-install>/crx-qiuckstart/logs/strderr/log`, use the following command `grep -o‘CRXSessionImpl’ strderr.log| wc -l`
+- [X] Go to `<aem-install>/crx-qiuckstart/logs/strderr/log`, use the following command `grep -o‘CRXSessionImpl’ strderr.log| wc -l`
 
 ## [Reading](reading/question-10.md)
 
@@ -126,7 +126,7 @@ An online insurance company website has user-generated content that must be repl
 
 ## Answers
 - [ ] Configure the dispatcher flush agent in publish instance.
-- [x] Configure reverse replication agents for the author.
+- [X] Configure reverse replication agents for the author.
 - [ ] Configure the replication agent in the publish instances.
 - [ ] Disable static agent in the author instance.
 
@@ -136,7 +136,7 @@ An online insurance company website has user-generated content that must be repl
 A developer must create a workflow step that assigns a `WorkItem` to the appropriate person based on who has the least amount work to do. The group that must perform the action is configured into the workflow. Which non-deprecated interface should the Java implementation class use to perform the assignment?
 
 ## Answers
-- [x] `com.adobe.granite.workflow.exec.ParticipantStepChooser`
+- [X] `com.adobe.granite.workflow.exec.ParticipantStepChooser`
 - [ ] `com.day.cq.workflow.exec.ParticipantChooser`
 - [ ] `com.day.cq.workflow.exec.WorkItem`
 - [ ] `com.adobe.granite.workflow.exec.WorkflowData`
@@ -150,7 +150,7 @@ From which AEM Web Console should a developer access and download full AEM Log F
 
 ## Answers
 - [ ] Web Console -> System Information
-- [x] Status -> Log files
+- [X] Status -> Log files
 - [ ] OSGI -> Sing Log Service
 - [ ] AEM -> Log files
 
@@ -162,7 +162,7 @@ From which AEM Web Console should a developer access and download full AEM Log F
 A developer needs to create a new component called “Component A”. Component A must show a list of other components that all have a resource type of existing “Component B”. Component A must render this list of tiles for each Component B where the tile rendering is different from the default one. The list of rendered tiles must be reusable by future new components. How should the developer implement this functionality?
 
 ## Answers
-- [x] Create a script for tile rendering in Component B and use `data-sly-resource` attribute with a Sling selector in Component A to render the tile.
+- [X] Create a script for tile rendering in Component B and use `data-sly-resource` attribute with a Sling selector in Component A to render the tile.
 - [ ] Component A overlays Component B and overwrites the base renderer to facilitate the tiles.
 - [ ] Component A inherits from Component B and overwrites the base renderer to facilitate the tiles.
 - [ ] Component A calls the HTL of Component B directly using a `data-sly-include` attribute.
@@ -173,7 +173,7 @@ A developer needs to create a new component called “Component A”. Component 
 For each CRX node in the hierarchy, which actions can be configured using the user admin interface?
 
 ## Answers
-- [x] Read, Modify, Create, Delete, Read ACL, Edit ACL, Replicate
+- [X] Read, Modify, Create, Delete, Read ACL, Edit ACL, Replicate
 - [ ] Read, Write, Read ACL, Edit ACL, Replicate
 - [ ] Read, Write, Delete, Edit ACL, Replicate
 - [ ] Read, Modify, Create, Delete, Read ACL, Edit ACL
@@ -189,7 +189,7 @@ An application runs specific license checks against certain DAM assets every day
 - [ ] Set up a cron job with curl calls with the admin user and use `request.getResourse().getResourceResolver()`.
 - [ ] Create a configuration line in PID `com.day.cq.security.ACLSetup` for the user that you obtain a session for via `ResourceResolverFactory.getResourceResolver(...)`.
 - [ ] Configure the user admin in PID `org.apache.sling.serviceusermapping.impl.ServiceUserMapperImpl` as user.default and make sure the service user exists and has `jcr:read` and `jcr:write` permissions.
-- [x] Create a configuration for PID `org.apache.sling.serviceusermapping.impl.ServiceUserMapperImpl.amended-damaccess` that references a pre-created service user with r/w permissions and use `ResourceResolverFactory.getServiceResourceResolver(...)`
+- [X] Create a configuration for PID `org.apache.sling.serviceusermapping.impl.ServiceUserMapperImpl.amended-damaccess` that references a pre-created service user with r/w permissions and use `ResourceResolverFactory.getServiceResourceResolver(...)`
 
 ---
 
@@ -197,7 +197,7 @@ An application runs specific license checks against certain DAM assets every day
 A developer is creating templates and/or components using CRXDE Lite. The developer needs to check the files into source control. Which tool should the developer use to achieve this goal?
 
 ## Answers
-- [x] vlt command
+- [X] vlt command
 - [ ] Content Explorer
 - [ ] http://localhost:4502/crx/checkout
 - [ ] mvn command
@@ -226,7 +226,7 @@ A developer is creating a new OSGi bundle `com.custom.package.b` to expose new s
   What will happen when the developer uploads the bundle com.custom.package.b into the system?
 
 ## Answers
-- [x] The bundle will install but fail the activation due to unsatisfied dependencies `com.sample.package.b` and `com.sample.package.c`.
+- [X] The bundle will install but fail the activation due to unsatisfied dependencies `com.sample.package.b` and `com.sample.package.c`.
 - [ ] The bundle will install but fail the activation due to unsatisfied dependency `com.sample.package.c`.
 - [ ] The bundle will install and activate successfully.
 - [ ] The bundle will install but fail the activation due to unsatisfied dependency `com.sample.package.b`.
@@ -237,7 +237,7 @@ A developer is creating a new OSGi bundle `com.custom.package.b` to expose new s
 A custom AEM application is using the PageManager API. What should a developer add to make the application compile and run correctly in AEM?
 
 ## Answers
-- [x] a maven dependency to AEM uber-jar to the content package
+- [X] a maven dependency to AEM uber-jar to the content package
 - [ ] a maven dependency to bundle cq-wcm-core to the application bundle
 - [ ] a maven dependency to AEM uber-jar to the application bundle
 - [ ] a maven dependency to bundle cq-wcm-api to the content package
@@ -253,7 +253,7 @@ How should a developer enable remote debugging of an AEM server without modifyin
 - [ ] Enable the remote debugging service through the AEM Cloud Services menu.
 - [ ] Rename the quickstart jar file to include the additional debug settings.
 - [ ] Enable the remote debugging service through the AEM Web Console.
-- [x] Include an additional JVM parameter when starting AEM with `java -jar`.
+- [X] Include an additional JVM parameter when starting AEM with `java -jar`.
 
 ## [Reading](https://docs.adobe.com/content/help/en/experience-manager-65/deploying/deploying/custom-standalone-install.html)
 
@@ -263,8 +263,8 @@ How should a developer enable remote debugging of an AEM server without modifyin
 A developer developed a workflow that makes a copy of every node created or modified under a certain path to a different one. The workflow launches but the nodes are not copied over. Which two methods should the developer use to resolve this issue? (Choose two.)
 
 ## Answers
-- [x] Go to Workflow Failures screen and check if any instances of the workflow are present.
-- [x] Go to Workflow instances screen and verify that the instance of the workflow is present and check its status.
+- [X] Go to Workflow Failures screen and check if any instances of the workflow are present.
+- [X] Go to Workflow instances screen and verify that the instance of the workflow is present and check its status.
 - [ ] Go to Package Manager screen and reinstall the bundle that contains the workflow so it restarts.
 - [ ] Go to Workflow Models screen, then delete and recreate the workflow.
 - [ ] Go to Workflow Launchers and create a new launcher for the workflow even if one already exists.
@@ -280,7 +280,7 @@ A developer creates an AEM editable template that includes a Layout Container. W
 - [ ] The Layout Container does NOT have a policy.
 - [ ] The page template has NOT been enabled.
 - [ ] The page template has NOT been published.
-- [x] The Layout Container has NOT been unlocked.
+- [X] The Layout Container has NOT been unlocked.
 
 ---
 
@@ -289,7 +289,7 @@ Too many pages are invalidated in the dispatcher cache when a page is published.
 
 ## Answers
 - [ ] Sticky session are NOT configured properly, resulting in requests being delivered to the wrong server.
-- [x] The level of cache invalidation is NOT appropriate for the published content model.
+- [X] The level of cache invalidation is NOT appropriate for the published content model.
 - [ ] File globbing in the dispatcher configuration is NOT correct.
 - [ ] The OS file system permissions are NOT properly configured.
 
@@ -303,7 +303,7 @@ A service component periodically retrieves content from an external REST interfa
 ## Answers
 - [ ] Underneath `/apps/<project>/settings`, create the sub folders global and prod and node with name <PID>.conf each and configure the properties via node properties.
 - [ ] Underneath `/config/<project>/settings`, create the sub folders config.default and config.prod and a file with the name <PID>.config each and list the properties as key value pairs in there.
-- [x] Underneath `/apps/<project>`, create the sub folders config and config.prod and a file with the name <PID>.config each and list the properties as key value pairs in there.
+- [X] Underneath `/apps/<project>`, create the sub folders config and config.prod and a file with the name <PID>.config each and list the properties as key value pairs in there.
 - [ ] Underneath `/config/<project>/settings`, create the sub folders config and config.prod and a file with the name <PID>.config each and list the properties as key value pairs in there
 
 ## [Reading](https://docs.adobe.com/content/help/en/experience-manager-65/deploying/configuring/configure-runmodes.html)
@@ -317,7 +317,7 @@ What is the artifact ID of the maven dependency that contains all core AEM APIs?
 - [ ] core-jar
 - [ ] api-jar
 - [ ] aem-jar
-- [x] uber-jar
+- [X] uber-jar
 
 ## [Reading](https://docs.adobe.com/content/help/en/experience-manager-65/developing/devtools/ht-projects-maven.html)
 
@@ -330,7 +330,7 @@ There are performance, stability, and security issues with an installed AEM inst
 - [ ] Delete and reinstall the AEM instance.
 - [ ] Install Adobe-provided Apache configuration file.
 - [ ] Stop, clear cache files, and restart the AEM instance.
-- [x] Install service pack updates from package share.
+- [X] Install service pack updates from package share.
 
 ---
 
@@ -339,7 +339,7 @@ A developer needs to ensure that the path `/content/<proj>/segments` exists on a
 
 ## Answers
 - [ ] update
-- [x] merge
+- [X] merge
 - [ ] replace
 - [ ] optional
 
@@ -351,7 +351,7 @@ Which maven plugin is required to install a content package on a local AEM envir
 ## Answers
 - [ ] Maven Install Plugin
 - [ ] FileVault Package Maven Plugin
-- [x] Content Package Maven Plugin
+- [X] Content Package Maven Plugin
 - [ ] Maven Bundle Plugin
 
 ## [Reading](https://docs.adobe.com/content/help/en/experience-manager-65/developing/devtools/vlt-mavenplugin.html)
@@ -364,8 +364,8 @@ A developer needs to implement a functionality that requires creating a Custom W
 ## Answers
 - [ ] Implement a Java class with this method `public void process(WorkItem item, WorkflowSession wfsession) throws WorkflowException`.
 - [ ] Implement a Java class extending from class com.adobe.granite.workflow.exec.WorkflowProcess.
-- [x] Create a Workflow component node of the Super Resource Type `cq/workflow/components/model/process` under the folder `/apps/components`.
-- [x] Implement a Java class implementing the interface `com.adobe.granite.workflow.exec.WorkflowProcess`.
+- [X] Create a Workflow component node of the Super Resource Type `cq/workflow/components/model/process` under the folder `/apps/components`.
+- [X] Implement a Java class implementing the interface `com.adobe.granite.workflow.exec.WorkflowProcess`.
 - [ ] Create a Workflow component node of the Super Resource Type `cq/workflow/components/step` under the folder `/etc/workflow/models`.
 
 ## [Reading](reading/question-28.md)
@@ -377,8 +377,8 @@ In which two ways can a developer keep simple and maintainable CRX Access Contro
 
 ## Answers
 - [ ] Delete the ‘everyone’ group.
-- [x] Use Deny statements sparingly.
-- [x] Assign access rights to user groups rather than users.
+- [X] Use Deny statements sparingly.
+- [X] Assign access rights to user groups rather than users.
 - [ ] Assign access rights user by user.
 - [ ] Use Deny statements extensively.
 
@@ -392,7 +392,7 @@ A developer wants to create a Client Library that will only be included on touch
 ## Answers
 - [ ] Add the line “#base=touch” to the js.txt and css.txt files in the Client Library Folder.
 - [ ] Create a resource folder called “touch” under the Client Library Folder.
-- [x] Set the channels property on the Client Library Folder to “touch”.
+- [X] Set the channels property on the Client Library Folder to “touch”.
 - [ ] Pass the parameter user-agent=’touch’ when referencing the Client Library.
 
 ## [Reading](https://docs.adobe.com/content/help/en/experience-manager-65/developing/introduction/clientlibs.html)
@@ -405,7 +405,7 @@ A developer is working on a project locally and needs to install packages manual
 ## Answers
 - [ ] Configure the maven install plugin by defining the target URL, username, and password as maven properties.
 - [ ] Run maven with the deploy phase. Maven will install the package on all local AEM instances running without further configuration.
-- [x] Add a maven profile and configure the content package maven plugin within this profile.
+- [X] Add a maven profile and configure the content package maven plugin within this profile.
 - [ ] Write a script that does a PUT call to AEM each time maven builds a new package.
 
 ## [Reading](https://docs.adobe.com/content/help/en/experience-manager-65/developing/devtools/vlt-mavenplugin.html)
@@ -416,7 +416,7 @@ A developer is working on a project locally and needs to install packages manual
 Which xml tag is used within the vault package definition to add a new path to a content package?
 
 ## Answers
-- [x] `<filter>`
+- [X] `<filter>`
 - [ ] `<content>`
 - [ ] `<path>`
 - [ ] `<rule>`
@@ -446,7 +446,7 @@ Refer to the following Client Library node structure:
   The JavaScript is NOT present in the Client Library when it is loaded. What should a developer do to resolve this issue?
 
 ## Answers
-- [x] Add `#base=js` as the first line in the js.txt file.
+- [X] Add `#base=js` as the first line in the js.txt file.
 - [ ] Change the js folder to a Client Library node and add the property `categories="[clientlibs.example]"`.
 - [ ] Split the js and css into 2 Client Libraries since they can’t be in the same Client Library.
 - [ ] Change the js folder to a Client Library node and embed it on the clientlibs node.
@@ -459,7 +459,7 @@ A developer wants to automatically truncate request log files once they exceed 1
 ## Answers
 - [ ] Apache Sling Customizable Request Data Logger
 - [ ] Adobe Granite Log Analysis Service
-- [x] Apache Sling Logging Writer Configuration
+- [X] Apache Sling Logging Writer Configuration
 - [ ] Apache Sling Logging Configuration
 
 ## [Reading](https://docs.adobe.com/content/help/en/experience-manager-65/deploying/configuring/osgi-configuration-settings.html)
@@ -472,7 +472,7 @@ A developer has a component located under the path /apps. This component has a C
 ## Answers
 - [ ] Change the ACLs for the Client Library.
 - [ ] Move the Client Library under `/apps/<project>` library.
-- [x] Add the property `allowProxy` with a boolean value true.
+- [X] Add the property `allowProxy` with a boolean value true.
 - [ ] Allow the path to the clientlibs on the dispatcher.
 
 ## [Reading](./reading/question-35.md)
@@ -483,7 +483,7 @@ A developer has a component located under the path /apps. This component has a C
 A Client-Side Library has the category “library.example”. Which HTL statement should a developer use to reference only the CSS files of this Client-Side Library?
 
 ## Answers
-- [x] `<sly data-sly-use.clientlib=”/libs/granite/sightly/templates/clientlib.html” data-sly-call=”${clientlib.css @ categories=’library.example’}”/>`
+- [X] `<sly data-sly-use.clientlib=”/libs/granite/sightly/templates/clientlib.html” data-sly-call=”${clientlib.css @ categories=’library.example’}”/>`
 - [ ] `<sly data-sly-use.clientlib=”/libs/granite/sightly/templates/clientlib.html” data-sly-call=”${clientlib.css @ category=’library.example’}”/>`
 - [ ] `<sly data-sly-use.clientlib=”/libs/granite/sightly/templates/clientlib.html” data-sly-call=”${clientlib.all @ categories=’library.example.css’}”/>`
 - [ ] `<sly data-sly-use.clientlib=”/libs/granite/sightly/templates/clientlib.html” data-sly-call=”${clientlib.all @ type=’css’, categories=’library.example’}”/>`
@@ -497,7 +497,7 @@ A developer is creating a custom component on the page `/latestBlogs.html` that 
 - [ ] Instantiate a node object with `session.getNode("/content/blogs")` and then iterate through the child nodes and print the title for each.
 - [ ] Use `PageManager.getPage(“/content/blogs”)` of the static `PageManager` class to instantiate a Page object and then iterate through the child pages and print the title for each.
 - [ ] Use the `QueryDebugger` to look for all children of `/content/blogs` and then iterate through the result set and print the title for each.
-- [x] Adapt the `resourceResolver` to the `PageManager` service, then use the `getPage("/content/blogs")` to instantiate a Page object and then iterate through the child pages and print the title for each.
+- [X] Adapt the `resourceResolver` to the `PageManager` service, then use the `getPage("/content/blogs")` to instantiate a Page object and then iterate through the child pages and print the title for each.
 
 ---
 
@@ -507,8 +507,8 @@ A banking AEM application contains functionality to calculate a mortgage rate ba
 ## Answers
 - [ ] Use `BundleContext.getServiceReference(...)` and `BundleContext.getService(...)` in application code to look up the required services just before usage.
 - [ ] Use static methods to avoid boilerplate in application code.
-- [x] Use a mock framework to be able to create and inject mocks in the test code.
-- [x] Use the standard OSGi @Reference annotation to wire the dependencies in application code.
+- [X] Use a mock framework to be able to create and inject mocks in the test code.
+- [X] Use the standard OSGi @Reference annotation to wire the dependencies in application code.
 - [ ] Deploy a third party dependency injection container to wire dependencies more efficiently in application code.
 
 ---
@@ -517,7 +517,7 @@ A banking AEM application contains functionality to calculate a mortgage rate ba
 A developer creates an editable template with a Layout Container. The developer needs to restrict the Layout Container to just one column layout. What should the developer do to the editable template to enforce this restriction?:
 
 ## Answers
-- [x] Using Template Editor, set the responsive settings to 1 column for Layout Container Policy.
+- [X] Using Template Editor, set the responsive settings to 1 column for Layout Container Policy.
 - [ ] Add responsive column control component to the template and set column type to 1.
 - [ ] Overlay wcm.foundation.components.page.responsive Client Library and set @max_col to 1.
 - [ ] Using Template Editor, lock the Structure Component for the template.
@@ -531,7 +531,7 @@ A custom AEM application has a run time dependency to a third party OSGi bundle 
 - [ ] Add the dependency to the third party bundle in the pom.xml of the project bundle.
 - [ ] Embed the third party bundle in the bundle that depends on it.
 - [ ] Embed the bundle in a content package to have it automatically deployed.
-- [x] Declare the dependency correctly using a link to the OSGi Bundle Repository (OBR).
+- [X] Declare the dependency correctly using a link to the OSGi Bundle Repository (OBR).
 
 ---
 
@@ -549,7 +549,7 @@ A developer is working with the following HTL expression in a component renderin
 
 ## Answers
 - [ ] path/page.bar.html/world
-- [x] path/page.bar.html/hello/world
+- [X] path/page.bar.html/hello/world
 - [ ] path/page.foo.bar.html/hello/world
 - [ ] path/page.infinity.json.bar.html/world
 
@@ -561,7 +561,7 @@ A developer running a local AEM instance and working on an AEM project needs to 
 ## Answers
 - [ ] Access CRXDE and upload the files through the interface.
 - [ ] Make the changes in CRXDE create a content package, download it, and expand it into the working directory after each change.
-- [x] Install FileVault bundle in the AEM instance and register the local working directory for synchronization.
+- [X] Install FileVault bundle in the AEM instance and register the local working directory for synchronization.
 - [ ] Build a Content Package using maven and deploy it after each change.
 
 ## [Reading](https://docs.adobe.com/content/help/en/experience-manager-64/developing/devtools/ht-vlttool.html)
@@ -574,7 +574,7 @@ A developer wants to consume AEM Page Data in a Single Page Application. The Sin
 ## Answers
 - [ ] Add JSON as the default extension in Apache Sling Servlet/Split Resolver and Error Handler Configuration.
 - [ ] Invoke the page URL with the extension .json to get the values to construct the required output.
-- [x] Implement a Sling Model Exporter for the components.
+- [X] Implement a Sling Model Exporter for the components.
 - [ ] Create a custom sling event handler to handler JSON requests.
 
 ## [Reading](https://docs.adobe.com/content/help/en/experience-manager-65/developing/components/json-exporter-components.html)
@@ -585,7 +585,7 @@ A developer wants to consume AEM Page Data in a Single Page Application. The Sin
 A custom AEM application contains a service component that needs to access the JCR repository within the activate method. The activate method uses `ResourceResolverFactory.getServiceResourceResolver(...)` without specifying a sub service name. What should a developer do to make sure the user service mapping for the service component is available?
 
 ## Answers
-- [x] Create a field of type ServiceUserMapped and annotate it with `@Reference`.
+- [X] Create a field of type ServiceUserMapped and annotate it with `@Reference`.
 - [ ] Wait for the service ServiceUserMapper via `BundleContext.getServiceReference(...)`.
 - [ ] Create a field of type ServiceUserMapped and annotate it with `@Reference` using `ReferencePolicy.DYNAMIC`.
 - [ ] Create a field of type ServiceUserMapper and annotate it with `@Reference` using `ReferencePolicy.STATIC`.
@@ -601,7 +601,7 @@ After a recent code deployment, an AEM site is experiencing longer than usual qu
 - [ ] Go to Tools > Operations >Diagnosis > Download Thread Dumps. Analyze the Thread Dumps to identify long running requests.
 - [ ] Go to Tools > Operations >Diagnosis > Log Message. Configure DEBUG log level on com.day.cq.search to monitor search queries.
 - [ ] Go to Tools > Operations > Diagnosis > Index Manager. Select the new Indexes and run a consistency check.
-- [x] Go to Tools > Operations >Diagnosis > Query Performance > Slow Queries. Select a Query and Click on Explain.
+- [X] Go to Tools > Operations >Diagnosis > Query Performance > Slow Queries. Select a Query and Click on Explain.
 
 ---
 
@@ -612,7 +612,7 @@ A developer installs the latest Service pack to a local AEM author instance. How
 - [ ] Replicate from package manager of publish instance.
 - [ ] Use upload/install from OSGI console of publish instance.
 - [ ] Use upload/install from OSGI console of author instance.
-- [x] Replicate from package manager of author instance.
+- [X] Replicate from package manager of author instance.
 
 ---
 
@@ -623,7 +623,7 @@ Two AEM publish feed a single Dispatcher. Which part of the Dispatcher configura
 - [ ] virtualhosts
 - [ ] cache
 - [ ] filter
-- [x] farms
+- [X] farms
 
 ## [Reading](https://docs.adobe.com/content/help/en/experience-manager-dispatcher/using/configuring/dispatcher-configuration.html#defining-farms-farms)
 
@@ -634,7 +634,7 @@ Two AEM publish feed a single Dispatcher. Which part of the Dispatcher configura
 
 ## Answers
 - [ ] A Launcher with the field exclude that has the value !jcr:nodetype==cq:Page.
-- [x] A Launcher with the field path pointing to the folder and nodetype field have the value cq:Page.
+- [X] A Launcher with the field path pointing to the folder and nodetype field have the value cq:Page.
 - [ ] A Launcher with the field path pointing to the folder and condition field and have the value jcr:content/jcr:primaryType==cq:Page.
 - [ ] A Launcher with the field condition that has the value jcr:content/page.
 
@@ -649,7 +649,7 @@ A developer creates a template-type for building editable templates. The resulti
 - [ ] Add the layout container component by including it on the actual page component.
 - [ ] Add a content policy to the template-type to disable the removal of the layout container.
 - [ ] Add the layout container component to the initial section of the template-type.
-- [x] Add the layout container component to the structure section of the template-type.
+- [X] Add the layout container component to the structure section of the template-type.
 
 ---
 
@@ -683,7 +683,7 @@ A developer creates two custom classes. ClassA has the following code:
 ## Answers
 - [ ] Create separate a log file in the OSGi web console -->Sling --> Log Support for logger com.aem.xyz.
 - [ ] Configure custom.log in the OSGi web console --> Sling --> Log Support and replace com.aem.xyz with com.aem.abc.
-- [x] Configure custom.log in the OSGi web console --> Sling --> Log Support and replace logger com.aem.abc with com.aem.
+- [X] Configure custom.log in the OSGi web console --> Sling --> Log Support and replace logger com.aem.abc with com.aem.
 - [ ] Configure custom.log in the OSGi web console --> Sling --> Log Support and replace the package com.aem.abc with com.aem.xyz.
 
 ## [Reading](https://docs.adobe.com/content/help/en/experience-manager-65/deploying/configuring/monitoring-and-maintaining.html#working-with-audit-records-and-log-files)
@@ -695,7 +695,7 @@ Which environment variable in the AEM start script should a developer modify to 
 
 ## Answers
 - [ ] CQ_HOST
-- [x] CQ_JVM_OPTS
+- [X] CQ_JVM_OPTS
 - [ ] CQ_PORT
 - [ ] CQ_RUNMODE
 
@@ -705,7 +705,7 @@ Which environment variable in the AEM start script should a developer modify to 
 AEM is installed in $AEM_HOME. In which subfolder are the command line startup and shutdown scripts located?
 
 ## Answers
-- [x] $AEM_HOME/crx-quickstart/bin/
+- [X] $AEM_HOME/crx-quickstart/bin/
 - [ ] $AEM_HOME/crx-quickstart/scripts/
 - [ ] $AEM_HOME/
 - [ ] $AEM_HOME/crx-quickstart/opt/
@@ -721,7 +721,7 @@ A customer bundle of an application is in state “Installed” after deploying 
 - [ ] Use the “Update” action for the bundle in the Apache Felix Web Console.
 - [ ] Use the “Start” action for the bundle in the Apache Felix Web Console.
 - [ ] Reinstall the content package using the package manager.
-- [x] Ensure all OSGi requirements are met and re-deploy using Maven.
+- [X] Ensure all OSGi requirements are met and re-deploy using Maven.
 
 ---
 
@@ -731,7 +731,7 @@ How should a developer configure the replication agent to flush the dispatcher c
 ## Answers
 - [ ] Set the serialization type property of the default agent to dispatcher flush.
 - [ ] Create a new replication agent and set transport URI to point to the dispatcher.
-- [x] Create a dispatcher flush agent in publish instance
+- [X] Create a dispatcher flush agent in publish instance
 - [ ] Create a reserve replication agent on the author instance.
 
 ## [Reading](https://docs.adobe.com/content/help/en/experience-manager-dispatcher/using/configuring/page-invalidate.html#invalidating-dispatcher-cache-from-a-publishing-instance)
@@ -743,7 +743,7 @@ Which log file should a developer use to search for exception stack traces?:
 
 ## Answers
 - [ ] <aem-install>/crx-quickstart/logs/request.log
-- [x] <aem-install>/crx-quickstart/logs/error.log
+- [X] <aem-install>/crx-quickstart/logs/error.log
 - [ ] <aem-install>/crx-quickstart/logs/access.log
 - [ ] <aem-install>/crx-quickstart/logs/info.log
 
@@ -758,7 +758,7 @@ A developer needs to configure sets of values according to the following paramet
 
 ## Answers
 - [ ] A custom cloud configuration
-- [x] A context aware configuration with buckets using an OSGi configuration
+- [X] A context aware configuration with buckets using an OSGi configuration
 - [ ] One OSGi configuration for the set of values with runmodes
 - [ ] A JCR property at the content root node of the site with inheritedPageProperties
 
@@ -770,7 +770,7 @@ A developer needs to configure sets of values according to the following paramet
 A developer needs to upgrade existing components (Proxy Components) based on Core Components Version 1(v1) to Core Components Version 2(v2). How should the developer upgrade to V2 Core Components?
 
 ## Answers
-- [x] Modify the sling:resourceSuperType property on the proxy component to point to V2 Component.
+- [X] Modify the sling:resourceSuperType property on the proxy component to point to V2 Component.
 - [ ] Modify the sling:resourceSuperType property on the proxy component to point to V1 Component.
 - [ ] Create a new Proxy Component and set sling:resourceType property to V2 Core Component.
 - [ ] Proxy Components will be automatically upgraded to the V2 Core Component on AEM Restart.
@@ -784,6 +784,6 @@ In which maven build phase is the content package assembled?
 - [ ] compile
 - [ ] deploy
 - [ ] package
-- [x] install
+- [X] install
 
 ---

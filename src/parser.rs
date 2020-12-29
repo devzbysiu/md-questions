@@ -9,6 +9,10 @@ use nom::sequence::tuple;
 use nom::IResult;
 use std::num::ParseIntError;
 
+const CHECKED: &str = "- [X] ";
+const UNCHECKED: &str = "- [ ] ";
+const NO_CHECKBOX: &str = "- ";
+
 pub(crate) fn questions(i: &str) -> IResult<&str, MdQuestions> {
     let (i, questions) = many1(question)(i)?;
     Ok((i, MdQuestions::new(questions)))
@@ -116,13 +120,14 @@ fn answers(i: &str) -> IResult<&str, Vec<Answer>> {
 }
 
 fn answer(i: &str) -> IResult<&str, Answer> {
-    let (i, (checkbox, text, _)) = tuple((alt((answer_checkbox, tag("- "))), line, char('\n')))(i)?;
-    let is_correct = matches!(checkbox, "- [x] " | "- ");
+    let (i, (checkbox, text, _)) =
+        tuple((alt((answer_checkbox, tag(NO_CHECKBOX))), line, char('\n')))(i)?;
+    let is_correct = matches!(checkbox, CHECKED | NO_CHECKBOX);
     Ok((i, Answer::new(text, is_correct)))
 }
 
 fn answer_checkbox(i: &str) -> IResult<&str, &str> {
-    alt((tag("- [ ] "), tag("- [x] ")))(i)
+    alt((tag(UNCHECKED), tag(CHECKED)))(i)
 }
 
 fn opt_reading_header(i: &str) -> IResult<&str, Option<String>> {
@@ -158,7 +163,7 @@ A developer needs to create a banner component. This component shows an image ac
 - [ ] Use and configure the teaser core component.
 - [ ] Create a new custom component from scratch.
 - [ ] Overlay the teaser core component.
-- [x] Inherit from the teaser core component.
+- [X] Inherit from the teaser core component.
 
 ---
 
@@ -166,11 +171,11 @@ A developer needs to create a banner component. This component shows an image ac
 A developer is working on a complex project with multiple bundles. One bundle provides an OSGi service for other bundles. Which two options are necessary to ensure that the other bundles can reference that OSGi service? (Choose two.)
 
 ## Answers
-- [x] The bundles consuming the service need to import the fully qualified name of the service interface.
+- [X] The bundles consuming the service need to import the fully qualified name of the service interface.
 - [ ] The service needs to correctly declare metatype information.
 - [ ] The bundle providing the service needs to contain a whitelist of allowed consumer bundles.
 - [ ] The bundle providing the service needs to contain an adequate SCR descriptor file.
-- [x] The bundle providing the service needs to export the java package of the service interface.
+- [X] The bundle providing the service needs to export the java package of the service interface.
 
 ---
 
@@ -179,7 +184,7 @@ The structure section of an editable template has a locked component. What happe
 
 ## Answers
 - [ ] The content stays in the same place but it ignored on pages using the template.
-- [x] The content is moved to the initial section of the editable template.
+- [X] The content is moved to the initial section of the editable template.
 - [ ] The content is deleted after confirmation from the template author.
 - [ ] The content is copied to the initial section of the editable template.
 
@@ -246,7 +251,7 @@ A developer needs to create a banner component. This component shows an image ac
 - [ ] Use and configure the teaser core component.
 - [ ] Create a new custom component from scratch.
 - [ ] Overlay the teaser core component.
-- [x] Inherit from the teaser core component.
+- [X] Inherit from the teaser core component.
 
 ## [Reading](reading/question-3-reading.md)
 
@@ -338,7 +343,7 @@ Describe rooted tree.
             Ok(("", Answer::new("Some answer", false)))
         );
         assert_eq!(
-            answer("- [x] Some answer\n"),
+            answer("- [X] Some answer\n"),
             Ok(("", Answer::new("Some answer", true)))
         );
         assert_eq!(
@@ -357,7 +362,7 @@ Describe rooted tree.
     fn test_answer_checkbox() {
         let _ = pretty_env_logger::try_init();
         assert_eq!(answer_checkbox("- [ ] "), Ok(("", "- [ ] ")));
-        assert_eq!(answer_checkbox("- [x] "), Ok(("", "- [x] ")));
+        assert_eq!(answer_checkbox("- [X] "), Ok(("", "- [X] ")));
     }
 
     #[test]
@@ -366,7 +371,7 @@ Describe rooted tree.
         let input = r#"- [ ] Use and configure the teaser core component.
 - [ ] Create a new custom component from scratch.
 - [ ] Overlay the teaser core component.
-- [x] Inherit from the teaser core component.
+- [X] Inherit from the teaser core component.
 "#;
         assert_eq!(
             answers(input),
@@ -385,7 +390,7 @@ Describe rooted tree.
     #[test]
     fn test_answers_parser_with_one_answer() {
         let _ = pretty_env_logger::try_init();
-        let input = r#"- [x] Use and configure the teaser core component.
+        let input = r#"- [X] Use and configure the teaser core component.
 "#;
         assert_eq!(
             answers(input),
