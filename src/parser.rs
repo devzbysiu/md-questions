@@ -384,26 +384,14 @@ Describe rooted tree.
     #[should_panic]
     fn test_question_metadata_parser_with_incorrect_type() {
         let _ = pretty_env_logger::try_init();
-        assert_eq!(
-            question_metadata(r#"[//]: # (type: incorrect)"#),
-            Ok((
-                "",
-                QuestionMetadata::default().with_question_type(QuestionType::Checkbox)
-            ))
-        );
+        question_metadata(r#"[//]: # (type: incorrect)"#).unwrap(); // should panic
     }
 
     #[test]
     #[should_panic]
     fn test_question_metadata_parser_with_incorrect_key() {
         let _ = pretty_env_logger::try_init();
-        assert_eq!(
-            question_metadata(r#"[//]: # (incorrect-key: checkbox)"#),
-            Ok((
-                "",
-                QuestionMetadata::default().with_question_type(QuestionType::Checkbox)
-            ))
-        );
+        question_metadata(r#"[//]: # (incorrect-key: checkbox)"#).unwrap(); // should panic
     }
 
     #[test]
@@ -413,6 +401,54 @@ Describe rooted tree.
             question_header("## Question 1 `Templates and Components`"),
             Ok(("", (1, "Templates and Components".into())))
         );
+    }
+
+    #[test]
+    fn test_number_and_category_parser_with_correct_input() {
+        let _ = pretty_env_logger::try_init();
+        assert_eq!(
+            number_and_category("## Question 1 `OSGi Services`"),
+            Ok(("", (1, "OSGi Services".into())))
+        );
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_number_and_category_parser_without_number() {
+        let _ = pretty_env_logger::try_init();
+        number_and_category("## Question `OSGi Services`").unwrap(); // should panic
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_number_and_category_parser_without_category() {
+        let _ = pretty_env_logger::try_init();
+        number_and_category("## Question 1").unwrap(); // should panic
+    }
+
+    #[test]
+    fn test_number_and_category_parser_with_empty_category() {
+        let _ = pretty_env_logger::try_init();
+        assert_eq!(
+            number_and_category("## Question 1 ``"),
+            Ok(("", (1, "".into())))
+        );
+    }
+
+    #[test]
+    fn test_number_and_category_parser_with_max_number() {
+        let _ = pretty_env_logger::try_init();
+        assert_eq!(
+            number_and_category("## Question 4294967295 `Category`"),
+            Ok(("", (4294967295, "Category".into())))
+        );
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_number_and_category_parser_with_too_big_number() {
+        let _ = pretty_env_logger::try_init();
+        number_and_category("## Question 4294967296``").unwrap(); // should panic
     }
 
     #[test]
