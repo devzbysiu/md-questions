@@ -35,8 +35,9 @@
 
 # <p id="about">About</p>
 
-The idea is simple: you write questions in markdown file using specified convention, then you can use this library to
-parse the markdown. Here are example questions with the description of the question structure:
+The idea is that you write questions in markdown file using specified convention, then you can use
+this library to parse the markdown. Here are example questions with the description of the question
+structure:
 
 ```markdown
 ## Question 1 `Programming Language` `Ignore`  // 1. Question Header: ## Question <number> `<category>` `<marker>`
