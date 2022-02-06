@@ -1,4 +1,4 @@
-use md_questions::{Answer, Question, MdQuestions};
+use md_questions::{Answer, MdQuestions, Question};
 use std::fs::read_to_string;
 
 #[test]
