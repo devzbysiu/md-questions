@@ -7,17 +7,11 @@
   </h3>
 
   <p>
-    <img src="https://github.com/devzbysiu/md-questions/workflows/Main/badge.svg" alt="CI status
-    badge" />
+    <img src="https://img.shields.io/github/workflow/status/devzbysiu/md-questions/ci?style=for-the-badge" alt="CI status badge" />
     <a href="https://codecov.io/gh/devzbysiu/md-questions">
       <img src="https://img.shields.io/codecov/c/github/devzbysiu/md-questions?style=for-the-badge&token=bfdc4b9d55534910ae48fba0b8e984d0" alt="Code coverage"/>
     </a>
-    <a href="https://crates.io/crates/md-questions">
-      <img src="https://img.shields.io/crates/l/md-questions?style=for-the-badge" alt="License"/>
-    </a>
-    <a href="https://docs.rs/md-questions">
-      <img src="https://img.shields.io/badge/docs-latest-blue.svg?style=for-the-badge" alt="docs.rs docs" />
-    </a>
+    <img src="https://img.shields.io/badge/license-MIT%2FAPACHE--2.0-blue?style=for-the-badge" alt="License"/>
   </p>
 
   <h3>
@@ -108,7 +102,7 @@ This multi-line aswers question is not yet supported.
 
 Add
 ```toml
-md_questions = "0.1.0"
+md_questions = { git = "https://github.com/devzbysiu/md-questions" }
 ```
 to your `Cargo.toml`
 
