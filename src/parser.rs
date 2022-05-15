@@ -517,7 +517,7 @@ Describe rooted tree.
     #[test]
     fn test_answers_header_parser() {
         let _ = pretty_env_logger::try_init();
-        assert_eq!(answers_header("## Answers\n"), Ok(("\n", "## Answers")))
+        assert_eq!(answers_header("## Answers\n"), Ok(("\n", "## Answers")));
     }
 
     #[test]
@@ -611,10 +611,10 @@ Describe rooted tree.
     fn test_reading_header_parser_with_broken_reading_header() {
         let _ = pretty_env_logger::try_init();
         let res = reading_header("## [Reading-broken](reading/question-3-reading.md)\n");
-        assert_eq!(true, res.is_err());
+        assert!(res.is_err());
 
         let res = reading_header("## [Reading-broken](reading/question-3-reading.md)\n");
-        assert_eq!(true, res.is_err());
+        assert!(res.is_err());
     }
 
     #[test]
