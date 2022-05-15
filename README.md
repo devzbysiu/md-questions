@@ -102,7 +102,7 @@ This multi-line aswers question is not yet supported.
 
 Add
 ```toml
-md_questions = { git = "https://github.com/devzbysiu/md-questions" }
+md_questions = { git = "https://github.com/devzbysiu/md-questions", rev = "5fb14b63b30324e026148592354713620aef7983" }
 ```
 to your `Cargo.toml`
 
