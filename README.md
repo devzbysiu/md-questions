@@ -75,7 +75,7 @@ println!("First question: {}", &questions[0].text());
 
 You can use marker to mark a question. Currently, only `Ignore` marker is supported (casing is not
 important).
-It allows to skip the parsing of the question.
+It allows skipping the parsing of the question.
 This way we can keep more advanced questions in the markdown but still use the library.
 
 ```markdown
