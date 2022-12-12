@@ -25,8 +25,7 @@ fn question(i: &str) -> IResult<&str, Question> {
         match metadata.question_type() {
             QuestionType::Checkbox => {
                 debug!("found question type: checkbox");
-                let (i, _) = new_line(i)?;
-                let (i, _) = new_line(i)?;
+                let (i, _) = space_between(i)?;
                 let (i, question) = checkbox_question(i)?;
                 return Ok((i, question));
             }
@@ -56,19 +55,16 @@ fn checkbox_question(i: &str) -> IResult<&str, Question> {
     let (i, (number, category)) = question_header(i)?;
     let (i, _) = new_line(i)?;
     let (i, text) = paragraph(i)?;
-    let (i, _) = new_line(i)?;
-    let (i, _) = new_line(i)?;
+    let (i, _) = space_between(i)?;
     let (i, _) = answers_header(i)?;
     let (i, _) = new_line(i)?;
     let (i, answers) = answers(i)?;
     let (i, _) = new_line(i)?;
     // let (i, _) = new_line(i)?; // TODO: this should be here to be consistent
     let (i, reading) = opt(reading_header)(i)?;
-    let (i, _) = opt_new_line(i)?;
-    let (i, _) = opt_new_line(i)?;
+    let (i, _) = opt_space_between(i)?;
     let (i, _) = horizontal_rule(i)?;
-    let (i, _) = new_line(i)?;
-    let (i, _) = new_line(i)?;
+    let (i, _) = space_between(i)?;
     let question = Question {
         number,
         text,
@@ -95,8 +91,7 @@ fn question_header(i: &str) -> IResult<&str, (u32, String)> {
         debug!("ignoring");
         let (input, _) = take_until("---")(input)?;
         let (input, _) = horizontal_rule(input)?;
-        let (input, _) = new_line(input)?;
-        let (input, _) = new_line(input)?;
+        let (input, _) = space_between(input)?;
         debug!("rest of te input");
         i = input;
     };
@@ -124,8 +119,23 @@ fn to_int(i: &str) -> Result<u32, ParseIntError> {
     i.parse::<u32>()
 }
 
+fn space_between(i: &str) -> IResult<&str, String> {
+    let (i, _) = new_line(i)?;
+    let (i, _) = new_line(i)?;
+    Ok((i, "\n\n".into()))
+}
+
 fn new_line(i: &str) -> IResult<&str, char> {
     char('\n')(i)
+}
+
+fn opt_space_between(i: &str) -> IResult<&str, Option<String>> {
+    let (i, n1) = opt_new_line(i)?;
+    let (i, n2) = opt_new_line(i)?;
+    if n1.is_some() && n2.is_some() {
+        return Ok((i, Some("\n\n".into())));
+    }
+    Ok((i, None))
 }
 
 fn opt_new_line(i: &str) -> IResult<&str, Option<char>> {
@@ -480,6 +490,19 @@ Describe rooted tree.
             question_header("## Question 1 `OSGi Services` `Ignore`"),
             Err(Error(nom::error::Error::new("", TakeUntil)))
         );
+    }
+
+    #[test]
+    fn test_space_between_parser() {
+        let _ = pretty_env_logger::try_init();
+        assert_eq!(space_between("\n\n"), Ok(("", "\n\n".into())));
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_space_between_parser_with_text_between_new_lines() {
+        let _ = pretty_env_logger::try_init();
+        space_between("\nsome text\n").unwrap(); // should panic
     }
 
     #[test]
