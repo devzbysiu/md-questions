@@ -426,7 +426,7 @@ Describe rooted tree.
         let _ = pretty_env_logger::try_init();
         assert_eq!(
             number_and_category("## Question 1 ``"),
-            Ok(("", (1, "".into())))
+            Ok(("", (1, String::new())))
         );
     }
 
@@ -620,7 +620,10 @@ Describe rooted tree.
     #[test]
     fn test_reading_header_parser_with_empty_url() {
         let _ = pretty_env_logger::try_init();
-        assert_eq!(reading_header("## [Reading]()\n"), Ok(("\n", "".into())));
+        assert_eq!(
+            reading_header("## [Reading]()\n"),
+            Ok(("\n", String::new()))
+        );
     }
 
     #[test]
