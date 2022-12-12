@@ -54,6 +54,3 @@ fn test_reading_checkbox_questions_from_file() {
 
     assert_eq!(questions.count(), 58);
 }
-
-#[test]
-fn test_parsing_open_questions() {}
