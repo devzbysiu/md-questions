@@ -21,8 +21,8 @@ pub(crate) fn questions(i: &str) -> IResult<&str, MdQuestions> {
 fn question(i: &str) -> IResult<&str, Question> {
     let _ = pretty_env_logger::try_init();
     let (i, metadata) = opt(question_metadata)(i)?;
-    if let Some(question_metadata) = metadata {
-        match question_metadata.question_type() {
+    if let Some(metadata) = metadata {
+        match metadata.question_type() {
             QuestionType::Checkbox => {
                 debug!("found question type: checkbox");
                 let (i, _) = new_line(i)?;
