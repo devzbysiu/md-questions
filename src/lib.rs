@@ -82,19 +82,19 @@ impl QuestionMetadata {
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum QuestionType {
-    Checkbox,
+    Closed,
 }
 
 impl From<&str> for QuestionType {
     fn from(value: &str) -> Self {
         assert!(value == "checkbox", "not supported question type: {value}");
-        Self::Checkbox
+        Self::Closed
     }
 }
 
 impl Default for QuestionType {
     fn default() -> Self {
-        Self::Checkbox
+        Self::Closed
     }
 }
 

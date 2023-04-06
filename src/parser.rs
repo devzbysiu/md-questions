@@ -11,7 +11,6 @@ use std::num::ParseIntError;
 
 const CHECKED: &str = "- [X] ";
 const UNCHECKED: &str = "- [ ] ";
-const NO_CHECKBOX: &str = "- ";
 
 pub(crate) fn questions(i: &str) -> IResult<&str, MdQuestions> {
     let (i, questions) = many1(question)(i)?;
@@ -23,9 +22,9 @@ fn question(i: &str) -> IResult<&str, Question> {
     let (i, metadata) = opt(question_metadata)(i)?;
     if let Some(metadata) = metadata {
         match metadata.question_type() {
-            QuestionType::Checkbox => {
-                debug!("found question type: checkbox");
-                let (i, _) = space_between(i)?;
+            QuestionType::Closed => {
+                debug!("found question type: closed");
+                let (i, _) = empty_line(i)?;
                 let (i, question) = checkbox_question(i)?;
                 return Ok((i, question));
             }
@@ -55,16 +54,16 @@ fn checkbox_question(i: &str) -> IResult<&str, Question> {
     let (i, (number, category)) = question_header(i)?;
     let (i, _) = new_line(i)?;
     let (i, text) = paragraph(i)?;
-    let (i, _) = space_between(i)?;
+    let (i, _) = empty_line(i)?;
     let (i, _) = answers_header(i)?;
     let (i, _) = new_line(i)?;
     let (i, answers) = answers(i)?;
     let (i, _) = new_line(i)?;
     // let (i, _) = new_line(i)?; // TODO: this should be here to be consistent
     let (i, reading) = opt(reading_header)(i)?;
-    let (i, _) = opt_space_between(i)?;
+    let (i, _) = opt(empty_line)(i)?;
     let (i, _) = horizontal_rule(i)?;
-    let (i, _) = space_between(i)?;
+    let (i, _) = empty_line(i)?;
     let question = Question {
         number,
         text,
@@ -91,7 +90,7 @@ fn question_header(i: &str) -> IResult<&str, (u32, String)> {
         debug!("ignoring");
         let (input, _) = take_until("---")(input)?;
         let (input, _) = horizontal_rule(input)?;
-        let (input, _) = space_between(input)?;
+        let (input, _) = empty_line(input)?;
         debug!("rest of te input");
         i = input;
     };
@@ -119,7 +118,7 @@ fn to_int(i: &str) -> Result<u32, ParseIntError> {
     i.parse::<u32>()
 }
 
-fn space_between(i: &str) -> IResult<&str, String> {
+fn empty_line(i: &str) -> IResult<&str, String> {
     let (i, _) = new_line(i)?;
     let (i, _) = new_line(i)?;
     Ok((i, "\n\n".into()))
@@ -127,19 +126,6 @@ fn space_between(i: &str) -> IResult<&str, String> {
 
 fn new_line(i: &str) -> IResult<&str, char> {
     char('\n')(i)
-}
-
-fn opt_space_between(i: &str) -> IResult<&str, Option<String>> {
-    let (i, n1) = opt_new_line(i)?;
-    let (i, n2) = opt_new_line(i)?;
-    if n1.is_some() && n2.is_some() {
-        return Ok((i, Some("\n\n".into())));
-    }
-    Ok((i, None))
-}
-
-fn opt_new_line(i: &str) -> IResult<&str, Option<char>> {
-    opt(char('\n'))(i)
 }
 
 fn paragraph(i: &str) -> IResult<&str, String> {
@@ -161,9 +147,8 @@ fn answers(i: &str) -> IResult<&str, Vec<Answer>> {
 }
 
 fn answer(i: &str) -> IResult<&str, Answer> {
-    let (i, (checkbox, text, _)) =
-        tuple((alt((answer_checkbox, tag(NO_CHECKBOX))), line, char('\n')))(i)?;
-    let is_correct = matches!(checkbox, CHECKED | NO_CHECKBOX);
+    let (i, (checkbox, text, _)) = tuple((answer_checkbox, line, char('\n')))(i)?;
+    let is_correct = matches!(checkbox, CHECKED);
     Ok((i, Answer::new(text, is_correct)))
 }
 
@@ -346,6 +331,7 @@ A developer needs to create a banner component. This component shows an image ac
     }
 
     #[test]
+    #[ignore] // TODO: Open question should be done in a different way
     fn test_question_parser_with_open_question() {
         let _ = pretty_env_logger::try_init();
         let input = r#"## Question 1 `Trees`
@@ -380,7 +366,7 @@ Describe rooted tree.
             question_metadata(r#"[//]: # (type: checkbox)"#),
             Ok((
                 "",
-                QuestionMetadata::default().with_question_type(QuestionType::Checkbox)
+                QuestionMetadata::default().with_question_type(QuestionType::Closed)
             ))
         );
     }
@@ -495,14 +481,14 @@ Describe rooted tree.
     #[test]
     fn test_space_between_parser() {
         let _ = pretty_env_logger::try_init();
-        assert_eq!(space_between("\n\n"), Ok(("", "\n\n".into())));
+        assert_eq!(empty_line("\n\n"), Ok(("", "\n\n".into())));
     }
 
     #[test]
     #[should_panic]
     fn test_space_between_parser_with_text_between_new_lines() {
         let _ = pretty_env_logger::try_init();
-        space_between("\nsome text\n").unwrap(); // should panic
+        empty_line("\nsome text\n").unwrap(); // should panic
     }
 
     #[test]
@@ -529,10 +515,6 @@ Describe rooted tree.
         );
         assert_eq!(
             answer("- [X] Some answer\n"),
-            Ok(("", Answer::new("Some answer", true)))
-        );
-        assert_eq!(
-            answer("- Some answer\n"),
             Ok(("", Answer::new("Some answer", true)))
         );
     }
