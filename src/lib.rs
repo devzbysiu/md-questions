@@ -58,7 +58,7 @@ impl Index<usize> for MdQuestions {
     fn index(&self, idx: usize) -> &Self::Output {
         self.questions
             .get(idx)
-            .unwrap_or_else(|| panic!("filed to get question from idx: {}", idx))
+            .unwrap_or_else(|| panic!("filed to get question from idx: {idx}"))
     }
 }
 
@@ -87,10 +87,8 @@ pub enum QuestionType {
 
 impl From<&str> for QuestionType {
     fn from(value: &str) -> Self {
-        match value {
-            "checkbox" => Self::Checkbox,
-            _ => panic!("not supported question type: {}", value),
-        }
+        assert!(value == "checkbox", "not supported question type: {value}");
+        Self::Checkbox
     }
 }
 

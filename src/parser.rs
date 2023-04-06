@@ -46,7 +46,7 @@ fn question_metadata(i: &str) -> IResult<&str, QuestionMetadata> {
     let mut metadata = QuestionMetadata::default();
     match key {
         "type" => metadata = metadata.with_question_type(QuestionType::from(value)),
-        _ => panic!("not supported key in question metadata: {}", key),
+        _ => panic!("not supported key in question metadata: {key}"),
     }
     Ok((i, metadata))
 }
