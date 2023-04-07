@@ -1,3 +1,4 @@
+use derive_builder::Builder;
 use either::Either;
 use parser::questions;
 use std::ops::Index;
@@ -66,13 +67,13 @@ impl Question {
     }
 
     #[must_use]
-    pub fn closed() -> ClosedQuestion {
-        ClosedQuestion::default()
+    pub fn closed() -> ClosedQuestionBuilder {
+        ClosedQuestionBuilder::default()
     }
 
     #[must_use]
-    pub fn open() -> OpenQuestion {
-        OpenQuestion::default()
+    pub fn open() -> OpenQuestionBuilder {
+        OpenQuestionBuilder::default()
     }
 }
 
@@ -130,46 +131,23 @@ impl Default for QuestionType {
     }
 }
 
-#[derive(Default, Debug, Eq, PartialEq, Clone)]
+#[derive(Default, Builder, Debug, Eq, PartialEq, Clone)]
 pub struct ClosedQuestion {
     number: u32,
+
+    #[builder(setter(into))]
     text: String,
+
     answers: Vec<ClosedAnswer>,
+
+    #[builder(setter(into, strip_option), default)]
     reading: Option<String>,
+
+    #[builder(setter(into))]
     category: String,
 }
 
 impl ClosedQuestion {
-    #[must_use]
-    pub fn with_number(mut self, number: u32) -> Self {
-        self.number = number;
-        self
-    }
-
-    #[must_use]
-    pub fn with_text<S: Into<String>>(mut self, text: S) -> Self {
-        self.text = text.into();
-        self
-    }
-
-    #[must_use]
-    pub fn with_answer(mut self, answer: ClosedAnswer) -> Self {
-        self.answers.push(answer);
-        self
-    }
-
-    #[must_use]
-    pub fn with_reading<S: Into<String>>(mut self, reading: S) -> Self {
-        self.reading = Some(reading.into());
-        self
-    }
-
-    #[must_use]
-    pub fn with_category<S: Into<String>>(mut self, category: S) -> Self {
-        self.category = category.into();
-        self
-    }
-
     #[must_use]
     pub fn number(&self) -> u32 {
         self.number
@@ -216,51 +194,23 @@ impl ClosedQuestion {
     }
 }
 
-#[derive(Default, Debug, Eq, PartialEq, Clone)]
+#[derive(Default, Builder, Debug, Eq, PartialEq, Clone)]
 pub struct OpenQuestion {
-    /// Number of the question in order.
     number: u32,
-    /// Question's content.
+
+    #[builder(setter(into))]
     text: String,
-    /// Correct answer.
+
     answer: OpenAnswer,
-    /// Additional materials. Optional.
+
+    #[builder(setter(into, strip_option), default)]
     reading: Option<String>,
-    /// Category of the question.
+
+    #[builder(setter(into))]
     category: String,
 }
 
 impl OpenQuestion {
-    #[must_use]
-    pub fn with_number(mut self, number: u32) -> Self {
-        self.number = number;
-        self
-    }
-
-    #[must_use]
-    pub fn with_text<S: Into<String>>(mut self, text: S) -> Self {
-        self.text = text.into();
-        self
-    }
-
-    #[must_use]
-    pub fn with_answer(mut self, answer: OpenAnswer) -> Self {
-        self.answer = answer;
-        self
-    }
-
-    #[must_use]
-    pub fn with_reading<S: Into<String>>(mut self, reading: S) -> Self {
-        self.reading = Some(reading.into());
-        self
-    }
-
-    #[must_use]
-    pub fn with_category<S: Into<String>>(mut self, category: S) -> Self {
-        self.category = category.into();
-        self
-    }
-
     #[must_use]
     pub fn number(&self) -> u32 {
         self.number

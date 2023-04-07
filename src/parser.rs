@@ -210,46 +210,49 @@ fn horizontal_rule(i: &str) -> IResult<&str, &str> {
 #[cfg(test)]
 mod test {
     use super::*;
+
     use crate::parser::question;
+
+    use anyhow::Result;
     use nom::error::ErrorKind::TakeUntil;
     use nom::Err::Error;
 
     #[test]
-    fn test_questions_parser() {
+    fn test_questions_parser() -> Result<()> {
         let _ = pretty_env_logger::try_init();
-        let input = r#"## Question 1 `Templates and Components`
-A developer needs to create a banner component. This component shows an image across the full width of the page. A title is shown on top of the image. This text can be aligned to the left, middle, or right. The core components feature a teaser component which matches almost all requirements, but not all. What is the most maintainable way for the developer to implement these requirements?
+        let input = r#"## Question 1 `Category 1`
+Question 1 text
 
 ## Answers
-- [ ] Use and configure the teaser core component.
-- [ ] Create a new custom component from scratch.
-- [ ] Overlay the teaser core component.
-- [X] Inherit from the teaser core component.
+- [ ] Answer 1
+- [ ] Answer 2
+- [ ] Answer 3
+- [X] Answer 4
 
 ---
 
-## Question 2 `OSGi Services`
-A developer is working on a complex project with multiple bundles. One bundle provides an OSGi service for other bundles. Which two options are necessary to ensure that the other bundles can reference that OSGi service? (Choose two.)
+## Question 2 `Category 2`
+Question 2 text
 
 ## Answers
-- [X] The bundles consuming the service need to import the fully qualified name of the service interface.
-- [ ] The service needs to correctly declare metatype information.
-- [ ] The bundle providing the service needs to contain a whitelist of allowed consumer bundles.
-- [ ] The bundle providing the service needs to contain an adequate SCR descriptor file.
-- [X] The bundle providing the service needs to export the java package of the service interface.
+- [X] Answer 1
+- [ ] Answer 2
+- [ ] Answer 3
+- [ ] Answer 4
+- [X] Answer 5
 
 ---
 
-## Question 3 `Templates and Components`
-The structure section of an editable template has a locked component. What happens to the content of that component when a developer unlocks it?
+## Question 3 `Category 3`
+Question 3 text
 
 ## Answers
-- [ ] The content stays in the same place but it ignored on pages using the template.
-- [X] The content is moved to the initial section of the editable template.
-- [ ] The content is deleted after confirmation from the template author.
-- [ ] The content is copied to the initial section of the editable template.
+- [ ] Answer 1
+- [X] Answer 2
+- [ ] Answer 3
+- [ ] Answer 4
 
-## [Reading](reading/question-3-reading.md)
+## [Reading](Reading 3)
 
 ---
 
@@ -260,61 +263,63 @@ The structure section of an editable template has a locked component. What happe
                 "",
                 MdQuestions::new(vec![
                     Question::closed()
-                        .with_number(1)
-                        .with_text("A developer needs to create a banner component. This component shows an image \
-                          across the full width of the page. A title is shown on top of the image. This text can be \
-                          aligned to the left, middle, or right. The core components feature a teaser component which \
-                          matches almost all requirements, but not all. What is the most maintainable way for the \
-                          developer to implement these requirements?")
-                        .with_answer(ClosedAnswer::new("Use and configure the teaser core component.", false))
-                        .with_answer(ClosedAnswer::new("Create a new custom component from scratch.", false))
-                        .with_answer(ClosedAnswer::new("Overlay the teaser core component.", false))
-                        .with_answer(ClosedAnswer::new("Inherit from the teaser core component.", true))
-                        .with_category("Templates and Components").into(),
+                        .number(1)
+                        .text("Question 1 text")
+                        .answers(vec![
+                            ClosedAnswer::new("Answer 1", false),
+                            ClosedAnswer::new("Answer 2", false),
+                            ClosedAnswer::new("Answer 3", false),
+                            ClosedAnswer::new("Answer 4", true)
+                        ])
+                        .category("Category 1")
+                        .build()?
+                        .into(),
                     Question::closed()
-                        .with_number(2)
-                        .with_text("A developer is working on a complex project with multiple bundles. One bundle \
-                          provides an OSGi service for other bundles. Which two options are necessary to ensure that \
-                          the other bundles can reference that OSGi service? (Choose two.)")
-                        .with_answer(ClosedAnswer::new( "The bundles consuming the service need to import the fully \
-                            qualified name of the service interface.", true))
-                        .with_answer(ClosedAnswer::new("The service needs to correctly declare metatype information.", false))
-                        .with_answer(ClosedAnswer::new("The bundle providing the service needs to contain a whitelist of \
-                            allowed consumer bundles.", false))
-                        .with_answer(ClosedAnswer::new("The bundle providing the service needs to contain an adequate SCR \
-                            descriptor file.", false))
-                        .with_answer(ClosedAnswer::new("The bundle providing the service needs to export the java package of \
-                            the service interface.", true))
-                        .with_category("OSGi Services").into(),
+                        .number(2)
+                        .text("Question 2 text")
+                        .answers(vec![
+                            ClosedAnswer::new("Answer 1", true),
+                            ClosedAnswer::new("Answer 2", false),
+                            ClosedAnswer::new("Answer 3", false),
+                            ClosedAnswer::new("Answer 4", false),
+                            ClosedAnswer::new("Answer 5", true),
+                        ])
+                        .category("Category 2")
+                        .build()?
+                        .into(),
                     Question::closed()
-                        .with_number(3)
-                        .with_text("The structure section of an editable template has a locked component. What happens \
-                          to the content of that component when a developer unlocks it?")
-                        .with_answer(ClosedAnswer::new("The content stays in the same place but it ignored on pages using \
-                            the template.", false))
-                        .with_answer(ClosedAnswer::new("The content is moved to the initial section of the editable template.", true))
-                        .with_answer(ClosedAnswer::new("The content is deleted after confirmation from the template author.", false))
-                        .with_answer(ClosedAnswer::new("The content is copied to the initial section of the editable template.", false))
-                        .with_reading("reading/question-3-reading.md")
-                        .with_category("Templates and Components").into()
+                        .number(3)
+                        .text("Question 3 text")
+                        .answers(vec![
+                            ClosedAnswer::new("Answer 1", false),
+                            ClosedAnswer::new("Answer 2", true),
+                            ClosedAnswer::new("Answer 3", false),
+                            ClosedAnswer::new("Answer 4", false),
+                        ])
+                        .reading("Reading 3")
+                        .category("Category 3")
+                        .build()?
+                        .into()
                 ])
             ))
         );
+
+        Ok(())
     }
 
     #[test]
-    fn test_question_parser_with_closed_question() {
+    fn test_question_parser_with_closed_question() -> Result<()> {
         let _ = pretty_env_logger::try_init();
-        let input = r#"## Question 1 `Templates and Components`
-A developer needs to create a banner component. This component shows an image across the full width of the page. A title is shown on top of the image. This text can be aligned to the left, middle, or right. The core components feature a teaser component which matches almost all requirements, but not all. What is the most maintainable way for the developer to implement these requirements?
+        let input = r#"## Question 1 `Category 1`
+Question 1 text
 
 ## Answers
-- [ ] Use and configure the teaser core component.
-- [ ] Create a new custom component from scratch.
-- [ ] Overlay the teaser core component.
-- [X] Inherit from the teaser core component.
+- [ ] Answer 1
+- [ ] Answer 2
+- [ ] Answer 3
+- [X] Answer 4
 
-## [Reading](reading/question-3-reading.md)
+## [Reading](Reading 1)
 
 ---
 
@@ -324,33 +329,39 @@ A developer needs to create a banner component. This component shows an image ac
             Ok((
                 "",
                 Question::closed()
-                    .with_number(1)
-                    .with_text("A developer needs to create a banner component. This component shows an image across the full width of the page. A title is shown on top of the image. This text can be aligned to the left, middle, or right. The core components feature a teaser component which matches almost all requirements, but not all. What is the most maintainable way for the developer to implement these requirements?")
-                    .with_answer(ClosedAnswer::new("Use and configure the teaser core component.", false))
-                    .with_answer(ClosedAnswer::new("Create a new custom component from scratch.", false))
-                    .with_answer(ClosedAnswer::new("Overlay the teaser core component.", false))
-                    .with_answer(ClosedAnswer::new("Inherit from the teaser core component.", true))
-                    .with_category("Templates and Components")
-                    .with_reading("reading/question-3-reading.md").into())
-            )
+                    .number(1)
+                    .text("Question 1 text")
+                    .answers(vec![
+                        ClosedAnswer::new("Answer 1", false),
+                        ClosedAnswer::new("Answer 2", false),
+                        ClosedAnswer::new("Answer 3", false),
+                        ClosedAnswer::new("Answer 4", true),
+                    ])
+                    .category("Category 1")
+                    .reading("Reading 1")
+                    .build()?
+                    .into()
+            ))
         );
+
+        Ok(())
     }
 
     #[test]
-    fn test_question_parser_with_question_metadata() {
+    fn test_question_parser_with_question_metadata() -> Result<()> {
         let _ = pretty_env_logger::try_init();
         let input = r#"[//]: # (type: closed)
 
-## Question 1 `Templates and Components`
-A developer needs to create a banner component. This component shows an image across the full width of the page. A title is shown on top of the image. This text can be aligned to the left, middle, or right. The core components feature a teaser component which matches almost all requirements, but not all. What is the most maintainable way for the developer to implement these requirements?
+## Question 1 `Category 1`
+Question 1 text
 
 ## Answers
-- [ ] Use and configure the teaser core component.
-- [ ] Create a new custom component from scratch.
-- [ ] Overlay the teaser core component.
-- [X] Inherit from the teaser core component.
+- [ ] Answer 1
+- [ ] Answer 2
+- [ ] Answer 3
+- [X] Answer 4
 
-## [Reading](reading/question-3-reading.md)
+## [Reading](Reading 1)
 
 ---
 
@@ -360,29 +371,37 @@ A developer needs to create a banner component. This component shows an image ac
             Ok((
                 "",
                 Question::closed()
-                    .with_number(1)
-                    .with_text("A developer needs to create a banner component. This component shows an image across the full width of the page. A title is shown on top of the image. This text can be aligned to the left, middle, or right. The core components feature a teaser component which matches almost all requirements, but not all. What is the most maintainable way for the developer to implement these requirements?")
-                    .with_answer(ClosedAnswer::new("Use and configure the teaser core component.", false))
-                    .with_answer(ClosedAnswer::new("Create a new custom component from scratch.", false))
-                    .with_answer(ClosedAnswer::new("Overlay the teaser core component.", false))
-                    .with_answer(ClosedAnswer::new("Inherit from the teaser core component.", true))
-                    .with_category("Templates and Components")
-                    .with_reading("reading/question-3-reading.md").into())
-            )
+                    .number(1)
+                    .text("Question 1 text")
+                    .answers(vec![
+                        ClosedAnswer::new("Answer 1", false),
+                        ClosedAnswer::new("Answer 2", false),
+                        ClosedAnswer::new("Answer 3", false),
+                        ClosedAnswer::new("Answer 4", true),
+                    ])
+                    .category("Category 1")
+                    .reading("Reading 1")
+                    .build()?
+                    .into()
+            ))
         );
+
+        Ok(())
     }
 
     #[test]
     #[ignore] // TODO: Open question should be done in a different way
-    fn test_question_parser_with_open_question() {
+    fn test_question_parser_with_open_question() -> Result<()> {
         let _ = pretty_env_logger::try_init();
-        let input = r#"## Question 1 `Trees`
-Describe rooted tree.
+        let input = r#""[//]: # (type: open)
+        
+## Question 1 `Category 1`
+Question 1 text
 
 ## Answer
-- Rooted tree is a tree which all edges are going in to the root node or all of them go out of the tree node.
+Answer
 
-## [Reading](reading/question-3-reading.md)
+## [Reading](Reading 1)
 
 ---
 
@@ -391,14 +410,18 @@ Describe rooted tree.
             question(input),
             Ok((
                 "",
-                Question::closed()
-                    .with_number(1)
-                    .with_text("Describe rooted tree.")
-                    .with_answer(ClosedAnswer::new("Rooted tree is a tree which all edges are going in to the root node or all of them go out of the tree node.", true))
-                    .with_category("Trees")
-                    .with_reading("reading/question-3-reading.md").into())
-            )
+                Question::open()
+                    .number(1)
+                    .text("Question 1 text")
+                    .answer(OpenAnswer::new("Answer"))
+                    .category("Category 1")
+                    .reading("Reading 1")
+                    .build()?
+                    .into()
+            ))
         );
+
+        Ok(())
     }
 
     #[test]
