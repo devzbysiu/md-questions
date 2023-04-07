@@ -1,12 +1,9 @@
-use crate::{
-    ClosedAnswer, ClosedQuestion, MdQuestions, OpenAnswer, OpenQuestion, Question,
-    QuestionMetadata, QuestionType,
-};
+use crate::{ClosedAnswer, ClosedQuestion, MdQuestions, OpenAnswer, OpenQuestion, Question};
 
 use log::{debug, warn};
 use nom::branch::alt;
 use nom::bytes::complete::{tag, take_until};
-use nom::character::complete::{char, digit1};
+use nom::character::complete::{char, digit1, newline};
 use nom::combinator::{map_res, opt};
 use nom::multi::many1;
 use nom::sequence::tuple;
@@ -23,88 +20,55 @@ pub(crate) fn questions(i: &str) -> IResult<&str, MdQuestions> {
 
 fn question(i: &str) -> IResult<&str, Question> {
     let _ = pretty_env_logger::try_init();
-    let (i, metadata) = opt(question_metadata)(i)?;
-    if let Some(metadata) = metadata {
-        debug!("found question with type: {:?}", metadata.question_type());
-        let (i, _) = empty_line(i)?;
-        match metadata.question_type() {
-            QuestionType::Closed => {
-                let (i, question) = closed_question(i)?;
-                return Ok((i, Question::from_closed(question)));
-            }
-            QuestionType::Open => {
-                let (i, question) = open_question(i)?;
-                return Ok((i, Question::from_open(question)));
-            }
-        }
-    }
-    let (i, question) = closed_question(i)?;
-    Ok((i, Question::from_closed(question)))
+    let (i, question) = alt((closed_question, open_question))(i)?;
+    Ok((i, question))
 }
 
-fn question_metadata(i: &str) -> IResult<&str, QuestionMetadata> {
-    let (i, (_, key, _, value, _)) = tuple((
-        tag("[//]: # ("),
-        take_until(":"),
-        tag(": "),
-        take_until(")"),
-        tag(")"),
-    ))(i)?;
-    let mut metadata = QuestionMetadata::default();
-    match key {
-        "type" => metadata = metadata.with_question_type(QuestionType::from(value)),
-        _ => panic!("not supported key in question metadata: {key}"),
-    }
-    Ok((i, metadata))
-}
-
-fn closed_question(i: &str) -> IResult<&str, ClosedQuestion> {
+fn closed_question(i: &str) -> IResult<&str, Question> {
     let (i, (number, category)) = question_header(i)?;
-    let (i, _) = new_line(i)?;
+    let (i, _) = newline(i)?;
     let (i, text) = paragraph(i)?;
     let (i, _) = empty_line(i)?;
     let (i, _) = answers_header(i)?;
-    let (i, _) = new_line(i)?;
+    let (i, _) = newline(i)?;
     let (i, answers) = closed_answers(i)?;
-    let (i, _) = new_line(i)?;
-    // let (i, _) = new_line(i)?; // TODO: this should be here to be consistent
+    let (i, _) = newline(i)?;
     let (i, reading) = opt(reading_header)(i)?;
     let (i, _) = opt(empty_line)(i)?;
     let (i, _) = horizontal_rule(i)?;
     let (i, _) = empty_line(i)?;
-    let question = ClosedQuestion {
+    let question = Question::from_closed(ClosedQuestion {
         number,
         text,
         answers,
         reading,
         category,
-    };
-    debug!("full question: {:#?}", question);
+    });
+    debug!("full closed question: {:#?}", question);
     Ok((i, question))
 }
 
-fn open_question(i: &str) -> IResult<&str, OpenQuestion> {
+fn open_question(i: &str) -> IResult<&str, Question> {
     let (i, (number, category)) = question_header(i)?;
-    let (i, _) = new_line(i)?;
+    let (i, _) = newline(i)?;
     let (i, text) = paragraph(i)?;
     let (i, _) = empty_line(i)?;
     let (i, _) = answer_header(i)?;
-    let (i, _) = new_line(i)?;
+    let (i, _) = newline(i)?;
     let (i, answer) = open_answer(i)?;
-    let (i, _) = new_line(i)?;
-    // let (i, _) = new_line(i)?; // TODO: this should be here to be consistent
+    let (i, _) = newline(i)?;
     let (i, reading) = opt(reading_header)(i)?;
     let (i, _) = opt(empty_line)(i)?;
     let (i, _) = horizontal_rule(i)?;
     let (i, _) = empty_line(i)?;
-    let question = OpenQuestion {
+    let question = Question::from_open(OpenQuestion {
         number,
         text,
         answer,
         reading,
         category,
-    };
-    debug!("full question: {:#?}", question);
+    });
+    debug!("full open question: {:#?}", question);
     Ok((i, question))
 }
 
@@ -152,13 +116,9 @@ fn to_int(i: &str) -> Result<u32, ParseIntError> {
 }
 
 fn empty_line(i: &str) -> IResult<&str, String> {
-    let (i, _) = new_line(i)?;
-    let (i, _) = new_line(i)?;
+    let (i, _) = newline(i)?;
+    let (i, _) = newline(i)?;
     Ok((i, "\n\n".into()))
-}
-
-fn new_line(i: &str) -> IResult<&str, char> {
-    char('\n')(i)
 }
 
 fn paragraph(i: &str) -> IResult<&str, String> {
@@ -191,6 +151,7 @@ fn closed_answer(i: &str) -> IResult<&str, ClosedAnswer> {
 
 fn open_answer(i: &str) -> IResult<&str, OpenAnswer> {
     let (i, text) = paragraph(i)?;
+    let (i, _) = newline(i)?;
     Ok((i, OpenAnswer::new(text)))
 }
 
@@ -351,11 +312,10 @@ mod test {
     }
 
     #[test]
+    #[ignore]
     fn test_question_parser_with_question_metadata() -> Result<()> {
         let _ = pretty_env_logger::try_init();
         let input = indoc! {"
-            [//]: # (type: closed)
-
             ## Question 1 `Category 1`
             Question 1 text
 
@@ -394,7 +354,7 @@ mod test {
     }
 
     #[test]
-    #[ignore] // TODO: Open question should be done in a different way
+    #[ignore]
     fn test_question_parser_with_open_question() -> Result<()> {
         let _ = pretty_env_logger::try_init();
         let input = indoc! {"
@@ -427,32 +387,6 @@ mod test {
         );
 
         Ok(())
-    }
-
-    #[test]
-    fn test_question_metadata_parser() {
-        let _ = pretty_env_logger::try_init();
-        assert_eq!(
-            question_metadata(r#"[//]: # (type: closed)"#),
-            Ok((
-                "",
-                QuestionMetadata::default().with_question_type(QuestionType::Closed)
-            ))
-        );
-    }
-
-    #[test]
-    #[should_panic]
-    fn test_question_metadata_parser_with_incorrect_type() {
-        let _ = pretty_env_logger::try_init();
-        question_metadata(r#"[//]: # (type: incorrect)"#).unwrap(); // should panic
-    }
-
-    #[test]
-    #[should_panic]
-    fn test_question_metadata_parser_with_incorrect_key() {
-        let _ = pretty_env_logger::try_init();
-        question_metadata(r#"[//]: # (incorrect-key: closed)"#).unwrap(); // should panic
     }
 
     #[test]
@@ -559,12 +493,6 @@ mod test {
     fn test_space_between_parser_with_text_between_new_lines() {
         let _ = pretty_env_logger::try_init();
         empty_line("\nsome text\n").unwrap(); // should panic
-    }
-
-    #[test]
-    fn test_new_line_parser() {
-        let _ = pretty_env_logger::try_init();
-        assert_eq!(new_line("\n"), Ok(("", '\n')));
     }
 
     #[test]

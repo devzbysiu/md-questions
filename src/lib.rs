@@ -91,46 +91,6 @@ impl From<OpenQuestion> for Question {
     }
 }
 
-#[derive(Debug, Default, PartialEq, Eq)]
-pub struct QuestionMetadata {
-    question_type: QuestionType,
-}
-
-impl QuestionMetadata {
-    #[must_use]
-    pub fn with_question_type(mut self, question_type: QuestionType) -> Self {
-        self.question_type = question_type;
-        self
-    }
-
-    #[must_use]
-    pub fn question_type(&self) -> &QuestionType {
-        &self.question_type
-    }
-}
-
-#[derive(Debug, PartialEq, Eq)]
-pub enum QuestionType {
-    Closed,
-    Open,
-}
-
-impl From<&str> for QuestionType {
-    fn from(value: &str) -> Self {
-        match value {
-            "closed" => Self::Closed,
-            "open" => Self::Open,
-            _ => panic!("not supported question type: {value}"),
-        }
-    }
-}
-
-impl Default for QuestionType {
-    fn default() -> Self {
-        Self::Closed
-    }
-}
-
 #[derive(Default, Builder, Debug, Eq, PartialEq, Clone)]
 pub struct ClosedQuestion {
     number: u32,
