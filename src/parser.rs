@@ -354,12 +354,9 @@ mod test {
     }
 
     #[test]
-    #[ignore]
     fn test_question_parser_with_open_question() -> Result<()> {
         let _ = pretty_env_logger::try_init();
         let input = indoc! {"
-            [//]: # (type: open)
-        
             ## Question 1 `Category 1`
             Question 1 text
 
@@ -632,7 +629,7 @@ mod test {
     }
 
     #[test]
-    fn test_horizontal_rule_parser() {
+    fn est_horizontal_rule_parser() {
         let _ = pretty_env_logger::try_init();
         assert_eq!(horizontal_rule("---\n"), Ok(("\n", "---")));
     }

@@ -1,11 +1,12 @@
 use derive_builder::Builder;
 use either::Either;
+use getset::{CopyGetters, Getters};
 use parser::questions;
 use std::ops::Index;
 
 mod parser;
 
-#[derive(Debug, Eq, PartialEq, Default)]
+#[derive(Debug, Getters, Eq, PartialEq, Default)]
 pub struct MdQuestions {
     questions: Vec<Question>,
 }
@@ -23,11 +24,6 @@ impl MdQuestions {
     #[must_use]
     pub fn is_empty(&self) -> bool {
         self.questions.is_empty()
-    }
-
-    #[must_use]
-    pub fn questions(&self) -> &[Question] {
-        &self.questions
     }
 }
 
@@ -91,7 +87,7 @@ impl From<OpenQuestion> for Question {
     }
 }
 
-#[derive(Default, Builder, Debug, Eq, PartialEq, Clone)]
+#[derive(Default, Getters, Builder, Debug, Eq, PartialEq, Clone)]
 pub struct ClosedQuestion {
     number: u32,
 
@@ -109,31 +105,6 @@ pub struct ClosedQuestion {
 
 impl ClosedQuestion {
     #[must_use]
-    pub fn number(&self) -> u32 {
-        self.number
-    }
-
-    #[must_use]
-    pub fn text(&self) -> String {
-        self.text.clone()
-    }
-
-    #[must_use]
-    pub fn answers(&self) -> &[ClosedAnswer] {
-        &self.answers
-    }
-
-    #[must_use]
-    pub fn reading(&self) -> Option<&String> {
-        self.reading.as_ref()
-    }
-
-    #[must_use]
-    pub fn category(&self) -> String {
-        self.category.clone()
-    }
-
-    #[must_use]
     pub fn answers_count(&self) -> usize {
         self.answers.len()
     }
@@ -146,7 +117,7 @@ impl ClosedQuestion {
     #[must_use]
     pub fn is_multi(&self) -> bool {
         let correct_answers = self
-            .answers()
+            .answers
             .iter()
             .filter(|&answer| answer.is_correct())
             .count();
@@ -154,7 +125,7 @@ impl ClosedQuestion {
     }
 }
 
-#[derive(Default, Builder, Debug, Eq, PartialEq, Clone)]
+#[derive(Default, Builder, Getters, Debug, Eq, PartialEq, Clone)]
 pub struct OpenQuestion {
     number: u32,
 
@@ -170,36 +141,10 @@ pub struct OpenQuestion {
     category: String,
 }
 
-impl OpenQuestion {
-    #[must_use]
-    pub fn number(&self) -> u32 {
-        self.number
-    }
-
-    #[must_use]
-    pub fn text(&self) -> String {
-        self.text.clone()
-    }
-
-    #[must_use]
-    pub fn answer(&self) -> &OpenAnswer {
-        &self.answer
-    }
-
-    #[must_use]
-    pub fn reading(&self) -> Option<&String> {
-        self.reading.as_ref()
-    }
-
-    #[must_use]
-    pub fn category(&self) -> String {
-        self.category.clone()
-    }
-}
-
-#[derive(Default, Debug, Eq, PartialEq, Clone)]
+#[derive(Default, Debug, CopyGetters, Eq, PartialEq, Clone)]
 pub struct ClosedAnswer {
     text: String,
+    #[getset(get_copy)]
     is_correct: bool,
 }
 
@@ -209,16 +154,6 @@ impl ClosedAnswer {
             text: text.into(),
             is_correct,
         }
-    }
-
-    #[must_use]
-    pub fn text(&self) -> String {
-        self.text.clone()
-    }
-
-    #[must_use]
-    pub fn is_correct(&self) -> bool {
-        self.is_correct
     }
 }
 
