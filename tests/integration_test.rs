@@ -25,7 +25,7 @@ fn test_reading_checkbox_questions_from_file() -> Result<()> {
     );
 
     let multiline_question = &questions[17];
-    assert_eq!(multiline_question,  
+    assert_eq!(multiline_question,
         &Question::closed()
             .number(18)
             .text(r#"A developer is creating a new OSGi bundle `com.custom.package.b` to expose new services. `com.custom.package.a` is already installed and active in the system and has the following package definition:
