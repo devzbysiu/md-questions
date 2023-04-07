@@ -1,4 +1,8 @@
-use crate::{Answer, MdQuestions, Question, QuestionMetadata, QuestionType};
+use crate::{
+    ClosedAnswer, ClosedQuestion, MdQuestions, OpenAnswer, OpenQuestion, Question,
+    QuestionMetadata, QuestionType,
+};
+
 use log::{debug, warn};
 use nom::branch::alt;
 use nom::bytes::complete::{tag, take_until};
@@ -21,17 +25,21 @@ fn question(i: &str) -> IResult<&str, Question> {
     let _ = pretty_env_logger::try_init();
     let (i, metadata) = opt(question_metadata)(i)?;
     if let Some(metadata) = metadata {
+        debug!("found question with type: {:?}", metadata.question_type());
+        let (i, _) = empty_line(i)?;
         match metadata.question_type() {
             QuestionType::Closed => {
-                debug!("found question type: closed");
-                let (i, _) = empty_line(i)?;
-                let (i, question) = checkbox_question(i)?;
-                return Ok((i, question));
+                let (i, question) = closed_question(i)?;
+                return Ok((i, Question::from_closed(question)));
+            }
+            QuestionType::Open => {
+                let (i, question) = open_question(i)?;
+                return Ok((i, Question::from_open(question)));
             }
         }
     }
-    let (i, question) = checkbox_question(i)?;
-    Ok((i, question))
+    let (i, question) = closed_question(i)?;
+    Ok((i, Question::from_closed(question)))
 }
 
 fn question_metadata(i: &str) -> IResult<&str, QuestionMetadata> {
@@ -50,24 +58,49 @@ fn question_metadata(i: &str) -> IResult<&str, QuestionMetadata> {
     Ok((i, metadata))
 }
 
-fn checkbox_question(i: &str) -> IResult<&str, Question> {
+fn closed_question(i: &str) -> IResult<&str, ClosedQuestion> {
     let (i, (number, category)) = question_header(i)?;
     let (i, _) = new_line(i)?;
     let (i, text) = paragraph(i)?;
     let (i, _) = empty_line(i)?;
     let (i, _) = answers_header(i)?;
     let (i, _) = new_line(i)?;
-    let (i, answers) = answers(i)?;
+    let (i, answers) = closed_answers(i)?;
     let (i, _) = new_line(i)?;
     // let (i, _) = new_line(i)?; // TODO: this should be here to be consistent
     let (i, reading) = opt(reading_header)(i)?;
     let (i, _) = opt(empty_line)(i)?;
     let (i, _) = horizontal_rule(i)?;
     let (i, _) = empty_line(i)?;
-    let question = Question {
+    let question = ClosedQuestion {
         number,
         text,
         answers,
+        reading,
+        category,
+    };
+    debug!("full question: {:#?}", question);
+    Ok((i, question))
+}
+
+fn open_question(i: &str) -> IResult<&str, OpenQuestion> {
+    let (i, (number, category)) = question_header(i)?;
+    let (i, _) = new_line(i)?;
+    let (i, text) = paragraph(i)?;
+    let (i, _) = empty_line(i)?;
+    let (i, _) = answer_header(i)?;
+    let (i, _) = new_line(i)?;
+    let (i, answer) = open_answer(i)?;
+    let (i, _) = new_line(i)?;
+    // let (i, _) = new_line(i)?; // TODO: this should be here to be consistent
+    let (i, reading) = opt(reading_header)(i)?;
+    let (i, _) = opt(empty_line)(i)?;
+    let (i, _) = horizontal_rule(i)?;
+    let (i, _) = empty_line(i)?;
+    let question = OpenQuestion {
+        number,
+        text,
+        answer,
         reading,
         category,
     };
@@ -142,14 +175,23 @@ fn answers_header(i: &str) -> IResult<&str, &str> {
     tag("## Answers")(i)
 }
 
-fn answers(i: &str) -> IResult<&str, Vec<Answer>> {
-    many1(answer)(i)
+fn answer_header(i: &str) -> IResult<&str, &str> {
+    tag("## Answer")(i)
 }
 
-fn answer(i: &str) -> IResult<&str, Answer> {
+fn closed_answers(i: &str) -> IResult<&str, Vec<ClosedAnswer>> {
+    many1(closed_answer)(i)
+}
+
+fn closed_answer(i: &str) -> IResult<&str, ClosedAnswer> {
     let (i, (checkbox, text, _)) = tuple((answer_checkbox, line, char('\n')))(i)?;
     let is_correct = matches!(checkbox, CHECKED);
-    Ok((i, Answer::new(text, is_correct)))
+    Ok((i, ClosedAnswer::new(text, is_correct)))
+}
+
+fn open_answer(i: &str) -> IResult<&str, OpenAnswer> {
+    let (i, text) = paragraph(i)?;
+    Ok((i, OpenAnswer::new(text)))
 }
 
 fn answer_checkbox(i: &str) -> IResult<&str, &str> {
@@ -217,51 +259,51 @@ The structure section of an editable template has a locked component. What happe
             Ok((
                 "",
                 MdQuestions::new(vec![
-                    Question::default()
+                    Question::closed()
                         .with_number(1)
                         .with_text("A developer needs to create a banner component. This component shows an image \
                           across the full width of the page. A title is shown on top of the image. This text can be \
                           aligned to the left, middle, or right. The core components feature a teaser component which \
                           matches almost all requirements, but not all. What is the most maintainable way for the \
                           developer to implement these requirements?")
-                        .with_answer(Answer::new("Use and configure the teaser core component.", false))
-                        .with_answer(Answer::new("Create a new custom component from scratch.", false))
-                        .with_answer(Answer::new("Overlay the teaser core component.", false))
-                        .with_answer(Answer::new("Inherit from the teaser core component.", true))
-                        .with_category("Templates and Components"),
-                    Question::default()
+                        .with_answer(ClosedAnswer::new("Use and configure the teaser core component.", false))
+                        .with_answer(ClosedAnswer::new("Create a new custom component from scratch.", false))
+                        .with_answer(ClosedAnswer::new("Overlay the teaser core component.", false))
+                        .with_answer(ClosedAnswer::new("Inherit from the teaser core component.", true))
+                        .with_category("Templates and Components").into(),
+                    Question::closed()
                         .with_number(2)
                         .with_text("A developer is working on a complex project with multiple bundles. One bundle \
                           provides an OSGi service for other bundles. Which two options are necessary to ensure that \
                           the other bundles can reference that OSGi service? (Choose two.)")
-                        .with_answer(Answer::new( "The bundles consuming the service need to import the fully \
+                        .with_answer(ClosedAnswer::new( "The bundles consuming the service need to import the fully \
                             qualified name of the service interface.", true))
-                        .with_answer(Answer::new("The service needs to correctly declare metatype information.", false))
-                        .with_answer(Answer::new("The bundle providing the service needs to contain a whitelist of \
+                        .with_answer(ClosedAnswer::new("The service needs to correctly declare metatype information.", false))
+                        .with_answer(ClosedAnswer::new("The bundle providing the service needs to contain a whitelist of \
                             allowed consumer bundles.", false))
-                        .with_answer(Answer::new("The bundle providing the service needs to contain an adequate SCR \
+                        .with_answer(ClosedAnswer::new("The bundle providing the service needs to contain an adequate SCR \
                             descriptor file.", false))
-                        .with_answer(Answer::new("The bundle providing the service needs to export the java package of \
+                        .with_answer(ClosedAnswer::new("The bundle providing the service needs to export the java package of \
                             the service interface.", true))
-                        .with_category("OSGi Services"),
-                    Question::default()
+                        .with_category("OSGi Services").into(),
+                    Question::closed()
                         .with_number(3)
                         .with_text("The structure section of an editable template has a locked component. What happens \
                           to the content of that component when a developer unlocks it?")
-                        .with_answer(Answer::new("The content stays in the same place but it ignored on pages using \
+                        .with_answer(ClosedAnswer::new("The content stays in the same place but it ignored on pages using \
                             the template.", false))
-                        .with_answer(Answer::new("The content is moved to the initial section of the editable template.", true))
-                        .with_answer(Answer::new("The content is deleted after confirmation from the template author.", false))
-                        .with_answer(Answer::new("The content is copied to the initial section of the editable template.", false))
+                        .with_answer(ClosedAnswer::new("The content is moved to the initial section of the editable template.", true))
+                        .with_answer(ClosedAnswer::new("The content is deleted after confirmation from the template author.", false))
+                        .with_answer(ClosedAnswer::new("The content is copied to the initial section of the editable template.", false))
                         .with_reading("reading/question-3-reading.md")
-                        .with_category("Templates and Components")
+                        .with_category("Templates and Components").into()
                 ])
             ))
         );
     }
 
     #[test]
-    fn test_question_parser_with_checkbox_question() {
+    fn test_question_parser_with_closed_question() {
         let _ = pretty_env_logger::try_init();
         let input = r#"## Question 1 `Templates and Components`
 A developer needs to create a banner component. This component shows an image across the full width of the page. A title is shown on top of the image. This text can be aligned to the left, middle, or right. The core components feature a teaser component which matches almost all requirements, but not all. What is the most maintainable way for the developer to implement these requirements?
@@ -281,23 +323,23 @@ A developer needs to create a banner component. This component shows an image ac
             question(input),
             Ok((
                 "",
-                Question::default()
+                Question::closed()
                     .with_number(1)
                     .with_text("A developer needs to create a banner component. This component shows an image across the full width of the page. A title is shown on top of the image. This text can be aligned to the left, middle, or right. The core components feature a teaser component which matches almost all requirements, but not all. What is the most maintainable way for the developer to implement these requirements?")
-                    .with_answer(Answer::new("Use and configure the teaser core component.", false))
-                    .with_answer(Answer::new("Create a new custom component from scratch.", false))
-                    .with_answer(Answer::new("Overlay the teaser core component.", false))
-                    .with_answer(Answer::new("Inherit from the teaser core component.", true))
+                    .with_answer(ClosedAnswer::new("Use and configure the teaser core component.", false))
+                    .with_answer(ClosedAnswer::new("Create a new custom component from scratch.", false))
+                    .with_answer(ClosedAnswer::new("Overlay the teaser core component.", false))
+                    .with_answer(ClosedAnswer::new("Inherit from the teaser core component.", true))
                     .with_category("Templates and Components")
-                    .with_reading("reading/question-3-reading.md")
-            ))
+                    .with_reading("reading/question-3-reading.md").into())
+            )
         );
     }
 
     #[test]
     fn test_question_parser_with_question_metadata() {
         let _ = pretty_env_logger::try_init();
-        let input = r#"[//]: # (type: checkbox)
+        let input = r#"[//]: # (type: closed)
 
 ## Question 1 `Templates and Components`
 A developer needs to create a banner component. This component shows an image across the full width of the page. A title is shown on top of the image. This text can be aligned to the left, middle, or right. The core components feature a teaser component which matches almost all requirements, but not all. What is the most maintainable way for the developer to implement these requirements?
@@ -317,16 +359,16 @@ A developer needs to create a banner component. This component shows an image ac
             question(input),
             Ok((
                 "",
-                Question::default()
+                Question::closed()
                     .with_number(1)
                     .with_text("A developer needs to create a banner component. This component shows an image across the full width of the page. A title is shown on top of the image. This text can be aligned to the left, middle, or right. The core components feature a teaser component which matches almost all requirements, but not all. What is the most maintainable way for the developer to implement these requirements?")
-                    .with_answer(Answer::new("Use and configure the teaser core component.", false))
-                    .with_answer(Answer::new("Create a new custom component from scratch.", false))
-                    .with_answer(Answer::new("Overlay the teaser core component.", false))
-                    .with_answer(Answer::new("Inherit from the teaser core component.", true))
+                    .with_answer(ClosedAnswer::new("Use and configure the teaser core component.", false))
+                    .with_answer(ClosedAnswer::new("Create a new custom component from scratch.", false))
+                    .with_answer(ClosedAnswer::new("Overlay the teaser core component.", false))
+                    .with_answer(ClosedAnswer::new("Inherit from the teaser core component.", true))
                     .with_category("Templates and Components")
-                    .with_reading("reading/question-3-reading.md")
-            ))
+                    .with_reading("reading/question-3-reading.md").into())
+            )
         );
     }
 
@@ -337,7 +379,7 @@ A developer needs to create a banner component. This component shows an image ac
         let input = r#"## Question 1 `Trees`
 Describe rooted tree.
 
-## Answers
+## Answer
 - Rooted tree is a tree which all edges are going in to the root node or all of them go out of the tree node.
 
 ## [Reading](reading/question-3-reading.md)
@@ -349,13 +391,13 @@ Describe rooted tree.
             question(input),
             Ok((
                 "",
-                Question::default()
+                Question::closed()
                     .with_number(1)
                     .with_text("Describe rooted tree.")
-                    .with_answer(Answer::new("Rooted tree is a tree which all edges are going in to the root node or all of them go out of the tree node.", true))
+                    .with_answer(ClosedAnswer::new("Rooted tree is a tree which all edges are going in to the root node or all of them go out of the tree node.", true))
                     .with_category("Trees")
-                    .with_reading("reading/question-3-reading.md")
-            ))
+                    .with_reading("reading/question-3-reading.md").into())
+            )
         );
     }
 
@@ -363,7 +405,7 @@ Describe rooted tree.
     fn test_question_metadata_parser() {
         let _ = pretty_env_logger::try_init();
         assert_eq!(
-            question_metadata(r#"[//]: # (type: checkbox)"#),
+            question_metadata(r#"[//]: # (type: closed)"#),
             Ok((
                 "",
                 QuestionMetadata::default().with_question_type(QuestionType::Closed)
@@ -382,7 +424,7 @@ Describe rooted tree.
     #[should_panic]
     fn test_question_metadata_parser_with_incorrect_key() {
         let _ = pretty_env_logger::try_init();
-        question_metadata(r#"[//]: # (incorrect-key: checkbox)"#).unwrap(); // should panic
+        question_metadata(r#"[//]: # (incorrect-key: closed)"#).unwrap(); // should panic
     }
 
     #[test]
@@ -510,12 +552,12 @@ Describe rooted tree.
     fn test_answer_parser() {
         let _ = pretty_env_logger::try_init();
         assert_eq!(
-            answer("- [ ] Some answer\n"),
-            Ok(("", Answer::new("Some answer", false)))
+            closed_answer("- [ ] Some answer\n"),
+            Ok(("", ClosedAnswer::new("Some answer", false)))
         );
         assert_eq!(
-            answer("- [X] Some answer\n"),
-            Ok(("", Answer::new("Some answer", true)))
+            closed_answer("- [X] Some answer\n"),
+            Ok(("", ClosedAnswer::new("Some answer", true)))
         );
     }
 
@@ -541,14 +583,14 @@ Describe rooted tree.
 - [X] Inherit from the teaser core component.
 "#;
         assert_eq!(
-            answers(input),
+            closed_answers(input),
             Ok((
                 "",
                 vec![
-                    Answer::new("Use and configure the teaser core component.", false),
-                    Answer::new("Create a new custom component from scratch.", false),
-                    Answer::new("Overlay the teaser core component.", false),
-                    Answer::new("Inherit from the teaser core component.", true)
+                    ClosedAnswer::new("Use and configure the teaser core component.", false),
+                    ClosedAnswer::new("Create a new custom component from scratch.", false),
+                    ClosedAnswer::new("Overlay the teaser core component.", false),
+                    ClosedAnswer::new("Inherit from the teaser core component.", true)
                 ]
             ))
         );
@@ -560,10 +602,10 @@ Describe rooted tree.
         let input = r#"- [X] Use and configure the teaser core component.
 "#;
         assert_eq!(
-            answers(input),
+            closed_answers(input),
             Ok((
                 "",
-                vec![Answer::new(
+                vec![ClosedAnswer::new(
                     "Use and configure the teaser core component.",
                     true
                 )]

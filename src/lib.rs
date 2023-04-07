@@ -1,24 +1,9 @@
+use either::Either;
 use parser::questions;
 use std::ops::Index;
 
 mod parser;
 
-/// Contains all questions parsed from markdown.
-///
-/// Example usage:
-/// ```
-/// # use std::error::Error;
-/// # use std::fs::read_to_string;
-/// use md_questions::MdQuestions;
-///
-/// # fn main() -> Result<(), Box<dyn Error>> {
-/// let content = read_to_string("res/checkbox-questions.md")?;
-/// let questions = MdQuestions::from(content.as_str());
-/// let first_question = &questions[0];
-/// println!("First question: {}", first_question.text());
-/// # Ok(())
-/// # }
-/// ```
 #[derive(Debug, Eq, PartialEq, Default)]
 pub struct MdQuestions {
     questions: Vec<Question>,
@@ -62,6 +47,49 @@ impl Index<usize> for MdQuestions {
     }
 }
 
+#[derive(Debug, Eq, PartialEq)]
+pub struct Question {
+    q: Either<ClosedQuestion, OpenQuestion>,
+}
+
+impl Question {
+    #[must_use]
+    pub fn from_closed(q: ClosedQuestion) -> Self {
+        Self { q: Either::Left(q) }
+    }
+
+    #[must_use]
+    pub fn from_open(q: OpenQuestion) -> Self {
+        Self {
+            q: Either::Right(q),
+        }
+    }
+
+    #[must_use]
+    pub fn closed() -> ClosedQuestion {
+        ClosedQuestion::default()
+    }
+
+    #[must_use]
+    pub fn open() -> OpenQuestion {
+        OpenQuestion::default()
+    }
+}
+
+impl From<ClosedQuestion> for Question {
+    fn from(q: ClosedQuestion) -> Self {
+        Self { q: Either::Left(q) }
+    }
+}
+
+impl From<OpenQuestion> for Question {
+    fn from(q: OpenQuestion) -> Self {
+        Self {
+            q: Either::Right(q),
+        }
+    }
+}
+
 #[derive(Debug, Default, PartialEq, Eq)]
 pub struct QuestionMetadata {
     question_type: QuestionType,
@@ -83,12 +111,16 @@ impl QuestionMetadata {
 #[derive(Debug, PartialEq, Eq)]
 pub enum QuestionType {
     Closed,
+    Open,
 }
 
 impl From<&str> for QuestionType {
     fn from(value: &str) -> Self {
-        assert!(value == "checkbox", "not supported question type: {value}");
-        Self::Closed
+        match value {
+            "closed" => Self::Closed,
+            "open" => Self::Open,
+            _ => panic!("not supported question type: {value}"),
+        }
     }
 }
 
@@ -98,41 +130,16 @@ impl Default for QuestionType {
     }
 }
 
-/// Single question.
-///
-/// Example of usage:
-/// ```
-/// # use std::error::Error;
-/// use md_questions::{Question, Answer};
-///
-/// # fn main() -> Result<(), Box<dyn Error>> {
-/// let question = Question::default()
-///     .with_number(1)
-///     .with_text("Why the sky is blue?")
-///     .with_answer(Answer::new("Because of oxygen", false))
-///     .with_answer(Answer::new("Because of oceans", false))
-///     .with_answer(Answer::new("Because of atmosphere", true))
-///     .with_answer(Answer::new("It's not", false))
-///     .with_category("General")
-///     .with_reading("https://spaceplace.nasa.gov/blue-sky/en/");
-/// # Ok(())
-/// # }
-/// ```
 #[derive(Default, Debug, Eq, PartialEq, Clone)]
-pub struct Question {
-    /// Number of the question in order.
+pub struct ClosedQuestion {
     number: u32,
-    /// Question's content.
     text: String,
-    /// Possible answers. Multiple answers can be correct.
-    answers: Vec<Answer>,
-    /// Additional materials. Optional.
+    answers: Vec<ClosedAnswer>,
     reading: Option<String>,
-    /// Category of the question.
     category: String,
 }
 
-impl Question {
+impl ClosedQuestion {
     #[must_use]
     pub fn with_number(mut self, number: u32) -> Self {
         self.number = number;
@@ -146,7 +153,7 @@ impl Question {
     }
 
     #[must_use]
-    pub fn with_answer(mut self, answer: Answer) -> Self {
+    pub fn with_answer(mut self, answer: ClosedAnswer) -> Self {
         self.answers.push(answer);
         self
     }
@@ -174,7 +181,7 @@ impl Question {
     }
 
     #[must_use]
-    pub fn answers(&self) -> &[Answer] {
+    pub fn answers(&self) -> &[ClosedAnswer] {
         &self.answers
     }
 
@@ -194,7 +201,7 @@ impl Question {
     }
 
     #[must_use]
-    pub fn answer(&self, idx: usize) -> Option<&Answer> {
+    pub fn answer(&self, idx: usize) -> Option<&ClosedAnswer> {
         self.answers.get(idx)
     }
 
@@ -209,27 +216,84 @@ impl Question {
     }
 }
 
-/// One of the answers available in a question.
-///
-/// Example usage:
-/// ```
-/// # use std::error::Error;
-/// use md_questions::Answer;
-///
-/// # fn main() -> Result<(), Box<dyn Error>> {
-/// let answer = Answer::new("Rust is great", true);
-/// # Ok(())
-/// # }
-/// ```
 #[derive(Default, Debug, Eq, PartialEq, Clone)]
-pub struct Answer {
-    /// Answer text.
+pub struct OpenQuestion {
+    /// Number of the question in order.
+    number: u32,
+    /// Question's content.
     text: String,
-    /// Is answer correct?
+    /// Correct answer.
+    answer: OpenAnswer,
+    /// Additional materials. Optional.
+    reading: Option<String>,
+    /// Category of the question.
+    category: String,
+}
+
+impl OpenQuestion {
+    #[must_use]
+    pub fn with_number(mut self, number: u32) -> Self {
+        self.number = number;
+        self
+    }
+
+    #[must_use]
+    pub fn with_text<S: Into<String>>(mut self, text: S) -> Self {
+        self.text = text.into();
+        self
+    }
+
+    #[must_use]
+    pub fn with_answer(mut self, answer: OpenAnswer) -> Self {
+        self.answer = answer;
+        self
+    }
+
+    #[must_use]
+    pub fn with_reading<S: Into<String>>(mut self, reading: S) -> Self {
+        self.reading = Some(reading.into());
+        self
+    }
+
+    #[must_use]
+    pub fn with_category<S: Into<String>>(mut self, category: S) -> Self {
+        self.category = category.into();
+        self
+    }
+
+    #[must_use]
+    pub fn number(&self) -> u32 {
+        self.number
+    }
+
+    #[must_use]
+    pub fn text(&self) -> String {
+        self.text.clone()
+    }
+
+    #[must_use]
+    pub fn answer(&self) -> &OpenAnswer {
+        &self.answer
+    }
+
+    #[must_use]
+    pub fn reading(&self) -> Option<&String> {
+        self.reading.as_ref()
+    }
+
+    #[must_use]
+    pub fn category(&self) -> String {
+        self.category.clone()
+    }
+}
+
+#[derive(Default, Debug, Eq, PartialEq, Clone)]
+pub struct ClosedAnswer {
+    text: String,
     is_correct: bool,
 }
 
-impl Answer {
+impl ClosedAnswer {
     pub fn new<S: Into<String>>(text: S, is_correct: bool) -> Self {
         Self {
             text: text.into(),
@@ -245,5 +309,16 @@ impl Answer {
     #[must_use]
     pub fn is_correct(&self) -> bool {
         self.is_correct
+    }
+}
+
+#[derive(Default, Debug, Eq, PartialEq, Clone)]
+pub struct OpenAnswer {
+    text: String,
+}
+
+impl OpenAnswer {
+    pub fn new<S: Into<String>>(text: S) -> Self {
+        Self { text: text.into() }
     }
 }
