@@ -214,49 +214,51 @@ mod test {
     use crate::parser::question;
 
     use anyhow::Result;
+    use indoc::indoc;
     use nom::error::ErrorKind::TakeUntil;
     use nom::Err::Error;
 
     #[test]
     fn test_questions_parser() -> Result<()> {
         let _ = pretty_env_logger::try_init();
-        let input = r#"## Question 1 `Category 1`
-Question 1 text
+        let input = indoc! {"
+            ## Question 1 `Category 1`
+            Question 1 text
 
-## Answers
-- [ ] Answer 1
-- [ ] Answer 2
-- [ ] Answer 3
-- [X] Answer 4
+            ## Answers
+            - [ ] Answer 1
+            - [ ] Answer 2
+            - [ ] Answer 3
+            - [X] Answer 4
 
----
+            ---
 
-## Question 2 `Category 2`
-Question 2 text
+            ## Question 2 `Category 2`
+            Question 2 text
 
-## Answers
-- [X] Answer 1
-- [ ] Answer 2
-- [ ] Answer 3
-- [ ] Answer 4
-- [X] Answer 5
+            ## Answers
+            - [X] Answer 1
+            - [ ] Answer 2
+            - [ ] Answer 3
+            - [ ] Answer 4
+            - [X] Answer 5
 
----
+            ---
 
-## Question 3 `Category 3`
-Question 3 text
+            ## Question 3 `Category 3`
+            Question 3 text
 
-## Answers
-- [ ] Answer 1
-- [X] Answer 2
-- [ ] Answer 3
-- [ ] Answer 4
+            ## Answers
+            - [ ] Answer 1
+            - [X] Answer 2
+            - [ ] Answer 3
+            - [ ] Answer 4
 
-## [Reading](Reading 3)
+            ## [Reading](Reading 3)
 
----
+            ---
 
-"#;
+        "};
         assert_eq!(
             questions(input),
             Ok((
@@ -310,20 +312,21 @@ Question 3 text
     #[test]
     fn test_question_parser_with_closed_question() -> Result<()> {
         let _ = pretty_env_logger::try_init();
-        let input = r#"## Question 1 `Category 1`
-Question 1 text
+        let input = indoc! {"
+            ## Question 1 `Category 1`
+            Question 1 text
 
-## Answers
-- [ ] Answer 1
-- [ ] Answer 2
-- [ ] Answer 3
-- [X] Answer 4
+            ## Answers
+            - [ ] Answer 1
+            - [ ] Answer 2
+            - [ ] Answer 3
+            - [X] Answer 4
 
-## [Reading](Reading 1)
+            ## [Reading](Reading 1)
 
----
+            ---
 
-"#;
+        "};
         assert_eq!(
             question(input),
             Ok((
@@ -350,22 +353,23 @@ Question 1 text
     #[test]
     fn test_question_parser_with_question_metadata() -> Result<()> {
         let _ = pretty_env_logger::try_init();
-        let input = r#"[//]: # (type: closed)
+        let input = indoc! {"
+            [//]: # (type: closed)
 
-## Question 1 `Category 1`
-Question 1 text
+            ## Question 1 `Category 1`
+            Question 1 text
 
-## Answers
-- [ ] Answer 1
-- [ ] Answer 2
-- [ ] Answer 3
-- [X] Answer 4
+            ## Answers
+            - [ ] Answer 1
+            - [ ] Answer 2
+            - [ ] Answer 3
+            - [X] Answer 4
 
-## [Reading](Reading 1)
+            ## [Reading](Reading 1)
 
----
+            ---
 
-"#;
+        "};
         assert_eq!(
             question(input),
             Ok((
@@ -393,19 +397,20 @@ Question 1 text
     #[ignore] // TODO: Open question should be done in a different way
     fn test_question_parser_with_open_question() -> Result<()> {
         let _ = pretty_env_logger::try_init();
-        let input = r#""[//]: # (type: open)
+        let input = indoc! {"
+            [//]: # (type: open)
         
-## Question 1 `Category 1`
-Question 1 text
+            ## Question 1 `Category 1`
+            Question 1 text
 
-## Answer
-Answer
+            ## Answer
+            Answer
 
-## [Reading](Reading 1)
+            ## [Reading](Reading 1)
 
----
+            ---
 
-"#;
+        "};
         assert_eq!(
             question(input),
             Ok((
@@ -600,11 +605,12 @@ Answer
     #[test]
     fn test_answers_parser_with_many_answers() {
         let _ = pretty_env_logger::try_init();
-        let input = r#"- [ ] Use and configure the teaser core component.
-- [ ] Create a new custom component from scratch.
-- [ ] Overlay the teaser core component.
-- [X] Inherit from the teaser core component.
-"#;
+        let input = indoc! {"
+            - [ ] Use and configure the teaser core component.
+            - [ ] Create a new custom component from scratch.
+            - [ ] Overlay the teaser core component.
+            - [X] Inherit from the teaser core component.
+        "};
         assert_eq!(
             closed_answers(input),
             Ok((
@@ -622,8 +628,9 @@ Answer
     #[test]
     fn test_answers_parser_with_one_answer() {
         let _ = pretty_env_logger::try_init();
-        let input = r#"- [X] Use and configure the teaser core component.
-"#;
+        let input = indoc! {"
+            - [X] Use and configure the teaser core component.
+        "};
         assert_eq!(
             closed_answers(input),
             Ok((
