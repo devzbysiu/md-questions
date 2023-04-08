@@ -26,19 +26,29 @@ fn question(i: &str) -> IResult<&str, Question> {
     Ok((i, question))
 }
 
+// Example of closed question:
+//
+// ```markdown
+// ## Question 3 `Category 3`
+// Question 3 text
+//
+// ## Answers
+// - [ ] Answer 1
+// - [X] Answer 2
+// - [ ] Answer 3
+// - [ ] Answer 4
+//
+// ## [Reading](Reading 3)
+//
+// ---
+//
+// ```
 fn closed_question(i: &str) -> IResult<&str, Question> {
-    let (i, (number, category)) = question_header(i)?;
-    let (i, _) = newline(i)?;
-    let (i, text) = paragraph(i)?;
-    let (i, _) = empty_line(i)?;
+    let (i, (number, category, text)) = question_prolog(i)?;
     let (i, _) = answers_header(i)?;
     let (i, _) = newline(i)?;
     let (i, answers) = closed_answers(i)?;
-    let (i, _) = newline(i)?;
-    let (i, reading) = opt(reading_header)(i)?;
-    let (i, _) = opt(empty_line)(i)?;
-    let (i, _) = horizontal_rule(i)?;
-    let (i, _) = empty_line(i)?;
+    let (i, reading) = question_epilog(i)?;
     let question = Question::from_closed(ClosedQuestion {
         number,
         text,
@@ -50,19 +60,74 @@ fn closed_question(i: &str) -> IResult<&str, Question> {
     Ok((i, question))
 }
 
-fn open_question(i: &str) -> IResult<&str, Question> {
+// Question Prolog
+//
+// ```markdown
+// ## Question 3 `Category 3` <-----
+// Question 3 text                  | - Prolog
+//                            <-----
+// ## Answers
+// - [ ] Answer 1
+// - [X] Answer 2
+// - [ ] Answer 3
+// - [ ] Answer 4
+//
+// ## [Reading](Reading 3)
+//
+// ---
+//
+// ```
+fn question_prolog(i: &str) -> IResult<&str, (u32, String, String)> {
     let (i, (number, category)) = question_header(i)?;
     let (i, _) = newline(i)?;
     let (i, text) = paragraph(i)?;
     let (i, _) = empty_line(i)?;
-    let (i, _) = answer_header(i)?;
-    let (i, _) = newline(i)?;
-    let (i, answer) = open_answer(i)?;
+    Ok((i, (number, category, text)))
+}
+
+// Question Epilog
+//
+// ```markdown
+// ## Question 3 `Category 3`
+// Question 3 text
+//
+// ## Answers
+// - [ ] Answer 1
+// - [X] Answer 2
+// - [ ] Answer 3
+// - [ ] Answer 4
+//                             <-----
+// ## [Reading](Reading 3)           |
+//                                   | - Epilog
+// ---                               |
+//                             <-----
+// ```
+fn question_epilog(i: &str) -> IResult<&str, Option<String>> {
     let (i, _) = newline(i)?;
     let (i, reading) = opt(reading_header)(i)?;
     let (i, _) = opt(empty_line)(i)?;
     let (i, _) = horizontal_rule(i)?;
     let (i, _) = empty_line(i)?;
+    Ok((i, reading))
+}
+
+// Example of open question:
+//
+// ```markdown
+// ## Question 3 `Category 3`
+// Question 3 text
+//
+// ## Answer
+// Some answer
+//
+// ## [Reading](Reading 3)
+// ```
+fn open_question(i: &str) -> IResult<&str, Question> {
+    let (i, (number, category, text)) = question_prolog(i)?;
+    let (i, _) = answer_header(i)?;
+    let (i, _) = newline(i)?;
+    let (i, answer) = open_answer(i)?;
+    let (i, reading) = question_epilog(i)?;
     let question = Question::from_open(OpenQuestion {
         number,
         text,
