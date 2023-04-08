@@ -1,4 +1,6 @@
-use crate::{ClosedAnswer, ClosedQuestion, MdQuestions, OpenAnswer, OpenQuestion, Question};
+use crate::answer::{ClosedAnswer, OpenAnswer};
+use crate::question::{ClosedQuestion, OpenQuestion, Question};
+use crate::MdQuestions;
 
 use log::{debug, warn};
 use nom::branch::alt;
@@ -629,7 +631,7 @@ mod test {
     }
 
     #[test]
-    fn est_horizontal_rule_parser() {
+    fn test_horizontal_rule_parser() {
         let _ = pretty_env_logger::try_init();
         assert_eq!(horizontal_rule("---\n"), Ok(("\n", "---")));
     }
