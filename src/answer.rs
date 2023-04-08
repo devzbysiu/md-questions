@@ -15,6 +15,14 @@ impl ClosedAnswer {
             is_correct,
         }
     }
+
+    pub fn incorrect<S: Into<String>>(text: S) -> Self {
+        Self::new(text, false)
+    }
+
+    pub fn correct<S: Into<String>>(text: S) -> Self {
+        Self::new(text, true)
+    }
 }
 
 #[derive(Default, Debug, Eq, PartialEq, Clone)]

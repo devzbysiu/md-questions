@@ -231,10 +231,10 @@ mod test {
                         .number(1)
                         .text("Question 1 text")
                         .answers(vec![
-                            ClosedAnswer::new("Answer 1", false),
-                            ClosedAnswer::new("Answer 2", false),
-                            ClosedAnswer::new("Answer 3", false),
-                            ClosedAnswer::new("Answer 4", true)
+                            ClosedAnswer::incorrect("Answer 1"),
+                            ClosedAnswer::incorrect("Answer 2"),
+                            ClosedAnswer::incorrect("Answer 3"),
+                            ClosedAnswer::correct("Answer 4")
                         ])
                         .category("Category 1")
                         .build()?
@@ -243,11 +243,11 @@ mod test {
                         .number(2)
                         .text("Question 2 text")
                         .answers(vec![
-                            ClosedAnswer::new("Answer 1", true),
-                            ClosedAnswer::new("Answer 2", false),
-                            ClosedAnswer::new("Answer 3", false),
-                            ClosedAnswer::new("Answer 4", false),
-                            ClosedAnswer::new("Answer 5", true),
+                            ClosedAnswer::correct("Answer 1"),
+                            ClosedAnswer::incorrect("Answer 2"),
+                            ClosedAnswer::incorrect("Answer 3"),
+                            ClosedAnswer::incorrect("Answer 4"),
+                            ClosedAnswer::correct("Answer 5"),
                         ])
                         .category("Category 2")
                         .build()?
@@ -256,10 +256,10 @@ mod test {
                         .number(3)
                         .text("Question 3 text")
                         .answers(vec![
-                            ClosedAnswer::new("Answer 1", false),
-                            ClosedAnswer::new("Answer 2", true),
-                            ClosedAnswer::new("Answer 3", false),
-                            ClosedAnswer::new("Answer 4", false),
+                            ClosedAnswer::incorrect("Answer 1"),
+                            ClosedAnswer::correct("Answer 2"),
+                            ClosedAnswer::incorrect("Answer 3"),
+                            ClosedAnswer::incorrect("Answer 4"),
                         ])
                         .reading("Reading 3")
                         .category("Category 3")
@@ -298,10 +298,10 @@ mod test {
                     .number(1)
                     .text("Question 1 text")
                     .answers(vec![
-                        ClosedAnswer::new("Answer 1", false),
-                        ClosedAnswer::new("Answer 2", false),
-                        ClosedAnswer::new("Answer 3", false),
-                        ClosedAnswer::new("Answer 4", true),
+                        ClosedAnswer::incorrect("Answer 1"),
+                        ClosedAnswer::incorrect("Answer 2"),
+                        ClosedAnswer::incorrect("Answer 3"),
+                        ClosedAnswer::correct("Answer 4"),
                     ])
                     .category("Category 1")
                     .reading("Reading 1")
@@ -340,10 +340,10 @@ mod test {
                     .number(1)
                     .text("Question 1 text")
                     .answers(vec![
-                        ClosedAnswer::new("Answer 1", false),
-                        ClosedAnswer::new("Answer 2", false),
-                        ClosedAnswer::new("Answer 3", false),
-                        ClosedAnswer::new("Answer 4", true),
+                        ClosedAnswer::incorrect("Answer 1"),
+                        ClosedAnswer::incorrect("Answer 2"),
+                        ClosedAnswer::incorrect("Answer 3"),
+                        ClosedAnswer::correct("Answer 4"),
                     ])
                     .category("Category 1")
                     .reading("Reading 1")
@@ -508,11 +508,11 @@ mod test {
         let _ = pretty_env_logger::try_init();
         assert_eq!(
             closed_answer("- [ ] Some answer\n"),
-            Ok(("", ClosedAnswer::new("Some answer", false)))
+            Ok(("", ClosedAnswer::incorrect("Some answer")))
         );
         assert_eq!(
             closed_answer("- [X] Some answer\n"),
-            Ok(("", ClosedAnswer::new("Some answer", true)))
+            Ok(("", ClosedAnswer::correct("Some answer")))
         );
     }
 
@@ -543,10 +543,10 @@ mod test {
             Ok((
                 "",
                 vec![
-                    ClosedAnswer::new("Use and configure the teaser core component.", false),
-                    ClosedAnswer::new("Create a new custom component from scratch.", false),
-                    ClosedAnswer::new("Overlay the teaser core component.", false),
-                    ClosedAnswer::new("Inherit from the teaser core component.", true)
+                    ClosedAnswer::incorrect("Use and configure the teaser core component."),
+                    ClosedAnswer::incorrect("Create a new custom component from scratch."),
+                    ClosedAnswer::incorrect("Overlay the teaser core component."),
+                    ClosedAnswer::correct("Inherit from the teaser core component.")
                 ]
             ))
         );
@@ -562,9 +562,8 @@ mod test {
             closed_answers(input),
             Ok((
                 "",
-                vec![ClosedAnswer::new(
-                    "Use and configure the teaser core component.",
-                    true
+                vec![ClosedAnswer::correct(
+                    "Use and configure the teaser core component."
                 )]
             ))
         );
