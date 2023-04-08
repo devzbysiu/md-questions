@@ -31,6 +31,21 @@ impl Question {
     pub fn open() -> OpenQuestionBuilder {
         OpenQuestionBuilder::default()
     }
+
+    #[must_use]
+    pub fn is_closed(&self) -> bool {
+        self.q.is_right()
+    }
+
+    #[must_use]
+    pub fn as_closed(self) -> Option<ClosedQuestion> {
+        self.q.left()
+    }
+
+    #[must_use]
+    pub fn as_open(self) -> Option<OpenQuestion> {
+        self.q.right()
+    }
 }
 
 impl From<ClosedQuestion> for Question {

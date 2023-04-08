@@ -35,14 +35,15 @@ structure:
 
 ```markdown
 ## Question 1 `Programming Language` `Ignore`  // 1. Question Header: ## Question <number> `<category>` `<marker>`
-What language was used to write this library?  // 2. Question Content. Can be multi-line.
-Pick one.                                      //
+What languages are used in this repository?    // 2. Question Content. Can be multi-line.
+Pick two.                                      //
                                                // 3. New line.
 ## Answers                                     // 4. Answers Header: ## Answers
 - [x] Rust                                     // 5. Answers.
 - [ ] Java                                     //    Only single-line answers.
 - [ ] Kotlin                                   //    Correct answer: - [x] <text>
 - [ ] Go                                       //    Incorrect answer: - [ ] <text>
+- [x] Bash                                     //    Multiple answers supported.
                                                // 6. New line.
 ## [Reading](reading/question-1.md)            // 7. Optional Reading Header: ## [Reading](<url>)
                                                // 8. New line.
@@ -51,7 +52,7 @@ Pick one.                                      //
 ## Question 2 `Clean Code`
 What letter S in SOLID acronym stands for?
 
-## Answers
+## Answers                                     // As many answers as you want
 - [ ] Substitution Principle
 - [ ] Sub Dependency Principle
 - [x] Single Responsibility Principle
@@ -59,6 +60,16 @@ What letter S in SOLID acronym stands for?
 - [ ] Super Closed Principle
 
 ---
+
+## Question 3 `Microservice Architecture`      // Open questions supported
+Describe Event Sourcing.
+
+## Answer
+Event Sourcing is a technique where instead
+of storing domain data as a whole, we keep
+track of all the operations made on that data
+(and we can restore the current state based
+on that log of operations if needed).
 
 ```
 
