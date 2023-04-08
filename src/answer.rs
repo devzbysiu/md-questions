@@ -4,6 +4,7 @@ use getset::CopyGetters;
 pub struct ClosedAnswer {
     #[getset(get = "pub")]
     text: String,
+
     #[getset(get_copy = "pub")]
     is_correct: bool,
 }

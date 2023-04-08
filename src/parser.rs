@@ -211,7 +211,7 @@ fn closed_answers(i: &str) -> IResult<&str, Vec<ClosedAnswer>> {
 }
 
 fn closed_answer(i: &str) -> IResult<&str, ClosedAnswer> {
-    let (i, (checkbox, text, _)) = tuple((answer_checkbox, line, char('\n')))(i)?;
+    let (i, (checkbox, text, _)) = tuple((answer_checkbox, line, newline))(i)?;
     let is_correct = matches!(checkbox, CHECKED);
     Ok((i, ClosedAnswer::new(text, is_correct)))
 }
