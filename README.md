@@ -35,7 +35,7 @@ structure:
 
 ```markdown
 ## Question 1 `Programming Language` `Ignore`  // 1. Question Header: ## Question <number> `<category>` `<marker>`
-What languages are used in this repository?    // 2. Question Content. Can be multi-line.
+Which languages are used in this repository?   // 2. Question Content. Can be multi-line.
 Pick two.                                      //
                                                // 3. New line.
 ## Answers                                     // 4. Answers Header: ## Answers
