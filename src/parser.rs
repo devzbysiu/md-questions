@@ -21,8 +21,7 @@ pub(crate) fn questions(i: &str) -> IResult<&str, MdQuestions> {
 }
 
 fn question(i: &str) -> IResult<&str, Question> {
-    let (i, question) = alt((closed_question, open_question))(i)?;
-    Ok((i, question))
+    alt((closed_question, open_question))(i)
 }
 
 // Example of closed question:
