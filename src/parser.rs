@@ -21,7 +21,6 @@ pub(crate) fn questions(i: &str) -> IResult<&str, MdQuestions> {
 }
 
 fn question(i: &str) -> IResult<&str, Question> {
-    let _ = pretty_env_logger::try_init();
     let (i, question) = alt((closed_question, open_question))(i)?;
     Ok((i, question))
 }
@@ -245,10 +244,10 @@ mod test {
     use indoc::indoc;
     use nom::error::ErrorKind::TakeUntil;
     use nom::Err::Error;
+    use test_log::test;
 
     #[test]
     fn test_questions_parser() -> Result<()> {
-        let _ = pretty_env_logger::try_init();
         let input = indoc! {"
             ## Question 1 `Category 1`
             Question 1 text
@@ -339,7 +338,6 @@ mod test {
 
     #[test]
     fn test_question_parser_with_closed_question() -> Result<()> {
-        let _ = pretty_env_logger::try_init();
         let input = indoc! {"
             ## Question 1 `Category 1`
             Question 1 text
@@ -381,7 +379,6 @@ mod test {
     #[test]
     #[ignore]
     fn test_question_parser_with_question_metadata() -> Result<()> {
-        let _ = pretty_env_logger::try_init();
         let input = indoc! {"
             ## Question 1 `Category 1`
             Question 1 text
@@ -422,7 +419,6 @@ mod test {
 
     #[test]
     fn test_question_parser_with_open_question() -> Result<()> {
-        let _ = pretty_env_logger::try_init();
         let input = indoc! {"
             ## Question 1 `Category 1`
             Question 1 text
@@ -455,7 +451,6 @@ mod test {
 
     #[test]
     fn test_question_header_parser_with_correct_input() {
-        let _ = pretty_env_logger::try_init();
         assert_eq!(
             question_header("## Question 1 `Templates and Components`"),
             Ok(("", (1, "Templates and Components".into())))
@@ -464,7 +459,6 @@ mod test {
 
     #[test]
     fn test_number_and_category_parser_with_correct_input() {
-        let _ = pretty_env_logger::try_init();
         assert_eq!(
             number_and_category("## Question 1 `OSGi Services`"),
             Ok(("", (1, "OSGi Services".into())))
@@ -474,20 +468,17 @@ mod test {
     #[test]
     #[should_panic]
     fn test_number_and_category_parser_without_number() {
-        let _ = pretty_env_logger::try_init();
         number_and_category("## Question `OSGi Services`").unwrap(); // should panic
     }
 
     #[test]
     #[should_panic]
     fn test_number_and_category_parser_without_category() {
-        let _ = pretty_env_logger::try_init();
         number_and_category("## Question 1").unwrap(); // should panic
     }
 
     #[test]
     fn test_number_and_category_parser_with_empty_category() {
-        let _ = pretty_env_logger::try_init();
         assert_eq!(
             number_and_category("## Question 1 ``"),
             Ok(("", (1, String::new())))
@@ -496,7 +487,6 @@ mod test {
 
     #[test]
     fn test_number_and_category_parser_with_max_number() {
-        let _ = pretty_env_logger::try_init();
         assert_eq!(
             number_and_category("## Question 4294967295 `Category`"),
             Ok(("", (4_294_967_295, "Category".into())))
@@ -506,40 +496,34 @@ mod test {
     #[test]
     #[should_panic]
     fn test_number_and_category_parser_with_too_big_number() {
-        let _ = pretty_env_logger::try_init();
         number_and_category("## Question 4294967296``").unwrap(); // should panic
     }
 
     #[test]
     fn test_marker_parser_with_correct_input() {
-        let _ = pretty_env_logger::try_init();
         assert_eq!(marker(" `Ignored`"), Ok(("", "Ignored".into())));
     }
 
     #[test]
     #[should_panic]
     fn test_marker_parser_with_not_opened_marker() {
-        let _ = pretty_env_logger::try_init();
         marker(" Ignored`").unwrap(); // should panic
     }
 
     #[test]
     #[should_panic]
     fn test_marker_parser_without_space_in_front() {
-        let _ = pretty_env_logger::try_init();
         marker("`Ignored`").unwrap(); // should panic
     }
 
     #[test]
     #[should_panic]
     fn test_marker_parser_with_not_closed_marker() {
-        let _ = pretty_env_logger::try_init();
         marker(" `Ignored").unwrap(); // should panic
     }
 
     #[test]
     fn test_question_header_parser_with_ignored_question() {
-        let _ = pretty_env_logger::try_init();
         assert_eq!(
             question_header("## Question 1 `OSGi Services` `Ignore`"),
             Err(Error(nom::error::Error::new("", TakeUntil)))
@@ -548,20 +532,17 @@ mod test {
 
     #[test]
     fn test_space_between_parser() {
-        let _ = pretty_env_logger::try_init();
         assert_eq!(empty_line("\n\n"), Ok(("", "\n\n".into())));
     }
 
     #[test]
     #[should_panic]
     fn test_space_between_parser_with_text_between_new_lines() {
-        let _ = pretty_env_logger::try_init();
         empty_line("\nsome text\n").unwrap(); // should panic
     }
 
     #[test]
     fn test_line_parser() {
-        let _ = pretty_env_logger::try_init();
         assert_eq!(
             line("Some text here\n"),
             Ok(("\n", "Some text here".into()))
@@ -570,7 +551,6 @@ mod test {
 
     #[test]
     fn test_answer_parser() {
-        let _ = pretty_env_logger::try_init();
         assert_eq!(
             closed_answer("- [ ] Some answer\n"),
             Ok(("", ClosedAnswer::incorrect("Some answer")))
@@ -583,20 +563,17 @@ mod test {
 
     #[test]
     fn test_answers_header_parser() {
-        let _ = pretty_env_logger::try_init();
         assert_eq!(answers_header("## Answers\n"), Ok(("\n", "## Answers")));
     }
 
     #[test]
     fn test_answer_checkbox() {
-        let _ = pretty_env_logger::try_init();
         assert_eq!(answer_checkbox("- [ ] "), Ok(("", "- [ ] ")));
         assert_eq!(answer_checkbox("- [X] "), Ok(("", "- [X] ")));
     }
 
     #[test]
     fn test_answers_parser_with_many_answers() {
-        let _ = pretty_env_logger::try_init();
         let input = indoc! {"
             - [ ] Use and configure the teaser core component.
             - [ ] Create a new custom component from scratch.
@@ -619,7 +596,6 @@ mod test {
 
     #[test]
     fn test_answers_parser_with_one_answer() {
-        let _ = pretty_env_logger::try_init();
         let input = indoc! {"
             - [X] Use and configure the teaser core component.
         "};
@@ -636,7 +612,6 @@ mod test {
 
     #[test]
     fn test_reading_header_parser_with_correct_input() {
-        let _ = pretty_env_logger::try_init();
         assert_eq!(
             reading_header("## [Reading](reading/question-3-reading.md)\n"),
             Ok(("\n", "reading/question-3-reading.md".into()))
@@ -646,7 +621,6 @@ mod test {
     #[test]
     #[should_panic]
     fn test_reading_header_parser_with_url_not_closed() {
-        let _ = pretty_env_logger::try_init();
         reading_header("## [Reading](reading/question-3-reading.md\n").unwrap();
         // should panic
     }
@@ -654,7 +628,6 @@ mod test {
     #[test]
     #[should_panic]
     fn test_reading_header_parser_with_url_not_opened() {
-        let _ = pretty_env_logger::try_init();
         reading_header("## [Reading]reading/question-3-reading.md)\n").unwrap();
         // should panic
     }
@@ -662,7 +635,6 @@ mod test {
     #[test]
     #[should_panic]
     fn test_reading_header_parser_with_label_not_opened() {
-        let _ = pretty_env_logger::try_init();
         reading_header("## Reading](reading/question-3-reading.md)\n").unwrap();
         // should panic
     }
@@ -670,14 +642,12 @@ mod test {
     #[test]
     #[should_panic]
     fn test_reading_header_parser_with_label_not_closed() {
-        let _ = pretty_env_logger::try_init();
         reading_header("## [Reading(reading/question-3-reading.md)\n").unwrap();
         // should panic
     }
 
     #[test]
     fn test_reading_header_parser_with_broken_reading_header() {
-        let _ = pretty_env_logger::try_init();
         let res = reading_header("## [Reading-broken](reading/question-3-reading.md)\n");
         assert!(res.is_err());
 
@@ -687,7 +657,6 @@ mod test {
 
     #[test]
     fn test_reading_header_parser_with_empty_url() {
-        let _ = pretty_env_logger::try_init();
         assert_eq!(
             reading_header("## [Reading]()\n"),
             Ok(("\n", String::new()))
@@ -696,7 +665,6 @@ mod test {
 
     #[test]
     fn test_horizontal_rule_parser() {
-        let _ = pretty_env_logger::try_init();
         assert_eq!(horizontal_rule("---\n"), Ok(("\n", "---")));
     }
 }
