@@ -20,7 +20,9 @@ fn test_reading_closed_questions_from_file() -> Result<()> {
             ClosedAnswer::incorrect("Overlay the teaser core component."),
             ClosedAnswer::correct("Inherit from the teaser core component.")
         ])
-        .category("Templates and Components").build()?.into()
+        .category("Templates and Components")
+        .build()?
+        .into()
     );
 
     assert_eq!(questions.count(), 58);
