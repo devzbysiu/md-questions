@@ -38,8 +38,8 @@ impl Question {
     }
 
     #[must_use]
-    pub fn as_closed(self) -> Option<ClosedQuestion> {
-        self.q.left()
+    pub fn as_closed(&self) -> Option<ClosedQuestion> {
+        self.q.clone().left()
     }
 
     #[must_use]
@@ -63,19 +63,19 @@ impl From<OpenQuestion> for Question {
 }
 
 #[derive(Default, Getters, Builder, Debug, Eq, PartialEq, Clone)]
+#[get = "pub"]
+#[builder(setter(into))]
 pub struct ClosedQuestion {
-    pub(crate) number: u32,
+    number: i32,
 
-    #[builder(setter(into))]
-    pub(crate) text: String,
+    text: String,
 
-    pub(crate) answers: Vec<ClosedAnswer>,
+    answers: Vec<ClosedAnswer>,
 
-    #[builder(setter(into, strip_option), default)]
-    pub(crate) reading: Option<String>,
+    #[builder(setter(into), default)]
+    reading: Option<String>,
 
-    #[builder(setter(into))]
-    pub(crate) category: String,
+    category: String,
 }
 
 impl ClosedQuestion {
@@ -102,7 +102,7 @@ impl ClosedQuestion {
 
 #[derive(Default, Builder, Getters, Debug, Eq, PartialEq, Clone)]
 pub struct OpenQuestion {
-    pub(crate) number: u32,
+    pub(crate) number: i32,
 
     #[builder(setter(into))]
     pub(crate) text: String,

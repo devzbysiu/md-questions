@@ -1,5 +1,5 @@
 use crate::answer::{ClosedAnswer, OpenAnswer};
-use crate::question::{ClosedQuestion, OpenQuestion, Question};
+use crate::question::{ClosedQuestionBuilder, OpenQuestion, Question};
 use crate::MdQuestions;
 
 use log::{debug, warn};
@@ -47,13 +47,16 @@ fn closed_question(i: &str) -> IResult<&str, Question> {
     let (i, _) = newline(i)?;
     let (i, answers) = closed_answers(i)?;
     let (i, reading) = question_epilog(i)?;
-    let question = Question::from_closed(ClosedQuestion {
-        number,
-        text,
-        answers,
-        reading,
-        category,
-    });
+    let question = Question::from_closed(
+        ClosedQuestionBuilder::default()
+            .number(number)
+            .text(text)
+            .answers(answers)
+            .reading(reading)
+            .category(category)
+            .build()
+            .unwrap(), // TODO: Get rid of this `unwrap`
+    );
     debug!("full closed question: {:#?}", question);
     Ok((i, question))
 }
@@ -75,7 +78,7 @@ fn closed_question(i: &str) -> IResult<&str, Question> {
 // ---
 //
 // ```
-fn question_prolog(i: &str) -> IResult<&str, (u32, String, String)> {
+fn question_prolog(i: &str) -> IResult<&str, (i32, String, String)> {
     let (i, (number, category)) = question_header(i)?;
     let (i, _) = newline(i)?;
     let (i, text) = paragraph(i)?;
@@ -137,7 +140,7 @@ fn open_question(i: &str) -> IResult<&str, Question> {
     Ok((i, question))
 }
 
-fn question_header(i: &str) -> IResult<&str, (u32, String)> {
+fn question_header(i: &str) -> IResult<&str, (i32, String)> {
     let mut i = i;
     let (input, num, category) = loop {
         debug!("loop with input: {}", i);
@@ -160,7 +163,7 @@ fn question_header(i: &str) -> IResult<&str, (u32, String)> {
     Ok((input, (num, category)))
 }
 
-fn number_and_category(i: &str) -> IResult<&str, (u32, String)> {
+fn number_and_category(i: &str) -> IResult<&str, (i32, String)> {
     let (i, (_, num, _, category, _)) = tuple((
         tag("## Question "),
         map_res(digit1, to_int),
@@ -176,8 +179,8 @@ fn marker(i: &str) -> IResult<&str, String> {
     Ok((i, marker.into()))
 }
 
-fn to_int(i: &str) -> Result<u32, ParseIntError> {
-    i.parse::<u32>()
+fn to_int(i: &str) -> Result<i32, ParseIntError> {
+    i.parse::<i32>()
 }
 
 fn empty_line(i: &str) -> IResult<&str, String> {
@@ -324,7 +327,7 @@ mod test {
                             ClosedAnswer::incorrect("Answer 3"),
                             ClosedAnswer::incorrect("Answer 4"),
                         ])
-                        .reading("Reading 3")
+                        .reading(Some("Reading 3".into()))
                         .category("Category 3")
                         .build()?
                         .into()
@@ -366,7 +369,7 @@ mod test {
                         ClosedAnswer::correct("Answer 4"),
                     ])
                     .category("Category 1")
-                    .reading("Reading 1")
+                    .reading(Some("Reading 1".into()))
                     .build()?
                     .into()
             ))
@@ -407,7 +410,7 @@ mod test {
                         ClosedAnswer::correct("Answer 4"),
                     ])
                     .category("Category 1")
-                    .reading("Reading 1")
+                    .reading(Some("Reading 1".into()))
                     .build()?
                     .into()
             ))
@@ -487,8 +490,8 @@ mod test {
     #[test]
     fn test_number_and_category_parser_with_max_number() {
         assert_eq!(
-            number_and_category("## Question 4294967295 `Category`"),
-            Ok(("", (4_294_967_295, "Category".into())))
+            number_and_category("## Question 2147483647 `Category`"),
+            Ok(("", (2_147_483_647, "Category".into())))
         );
     }
 
