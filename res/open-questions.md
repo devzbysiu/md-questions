@@ -28,4 +28,3 @@ Describe Digraph
 Graph in which edges have orientation.
 
 ---
-
