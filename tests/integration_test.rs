@@ -14,11 +14,11 @@ fn test_reading_closed_questions_from_file() {
     assert_eq!(closed_question.category(), "Templates and Components");
     assert_eq!(
         closed_question.text(),
-        "A developer needs to create a banner component. This component shows an image across \
-            the full width of the page. A title is shown on top of the image. This text can be \
-            aligned to the left, middle, or right. The core components feature a teaser component \
-            which matches almost all requirements, but not all. What is the most maintainable way \
-            for the developer to implement these requirements?"
+        "A developer needs to create a banner component. This component shows an image across the \
+        full width of the page. A title is shown on top of the image. This text can be aligned to \
+        the left, middle, or right. The core components feature a teaser component which matches \
+        almost all requirements, but not all. What is the most maintainable way for the developer \
+        to implement these requirements?"
     );
     assert_eq!(
         closed_question.answers(),
