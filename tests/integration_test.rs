@@ -1,4 +1,5 @@
-use md_questions::{ClosedAnswer, MdQuestions};
+use indoc::indoc;
+use md_questions::{ClosedAnswer, MdQuestions, OpenAnswer};
 use std::fs::read_to_string;
 
 #[test]
@@ -30,4 +31,32 @@ fn test_reading_closed_questions_from_file() {
         ]
     );
     assert!(closed_question.reading().is_none());
+}
+
+#[test]
+fn test_reading_open_questions_from_file() {
+    let content = read_to_string("res/open-questions.md").unwrap();
+    let questions = MdQuestions::from(content.as_str());
+    let first_question = &questions[0];
+
+    let Some(open_question) = first_question.as_open() else {
+        panic!("Should not happen");
+    };
+    assert_eq!(*open_question.number(), 1);
+    assert_eq!(open_question.category(), "Introduction");
+    assert_eq!(open_question.text(), "Enumerate common types of graphs");
+    assert_eq!(
+        open_question.answer(),
+        &OpenAnswer::new(indoc! {
+            "1. Undirected Graph
+             2. Directed Graph (Digraph)
+             3. Weighted Graph
+             4. Tree
+             5. Rooted Tree
+             6. Directed Acyclic Graph (DAG)
+             7. Bipartite Graph
+             8. Complete Graph"
+        })
+    );
+    assert!(open_question.reading().is_none());
 }

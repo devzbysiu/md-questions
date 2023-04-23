@@ -43,8 +43,8 @@ impl Question {
     }
 
     #[must_use]
-    pub fn as_open(self) -> Option<OpenQuestion> {
-        self.q.right()
+    pub fn as_open(&self) -> Option<OpenQuestion> {
+        self.q.clone().right()
     }
 }
 
@@ -101,6 +101,7 @@ impl ClosedQuestion {
 }
 
 #[derive(Default, Builder, Getters, Debug, Eq, PartialEq, Clone)]
+#[get = "pub"]
 pub struct OpenQuestion {
     pub(crate) number: i32,
 
